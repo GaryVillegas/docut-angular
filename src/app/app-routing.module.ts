@@ -11,6 +11,10 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'onboard',
+    loadChildren: () => import('./onboard/onboard.module').then( m => m.OnboardPageModule)
+  },
 ];
 
 @NgModule({
