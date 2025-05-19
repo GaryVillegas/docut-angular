@@ -14,9 +14,8 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.auth.authState.subscribe((user) => {
       if (user) {
-        // User is logged in
         console.log('User is logged in:', user);
-        this.router.navigate(['/tabs/home']); // Navigate to tabs page
+        this.router.navigate(['/tabs/home']);
       } else {
         // User is logged out
         console.log('User is logged out');

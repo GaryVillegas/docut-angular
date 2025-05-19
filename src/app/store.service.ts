@@ -1,30 +1,35 @@
 import { Injectable } from '@angular/core';
 import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-  AngularFirestoreDocument,
-} from '@angular/fire/compat/firestore';
-import { Observable, from } from 'rxjs';
-import { UserData, UserStoreData } from './store';
+  Firestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+} from '@angular/fire/firestore';
+import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UserData, UserStoreData } from './store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StoreService {
-  constructor(private store: AngularFirestore) {}
+  constructor(private firestore: Firestore) {}
 
-  //Funcion para crear datos del usuario, se almacena un array.
+  // Function to create user data, stores an array
   async createUserInfo(UID: string, userInfo: any): Promise<void> {
     try {
       if (!UID || !userInfo) {
         throw new Error('UID and userInfo are required');
       }
 
-      const userDoc: AngularFirestoreDocument<any> = this.store.doc(
-        `users/${UID}`
-      ); // Corrected path
-      await userDoc.set({ userInfo });
+      await setDoc(doc(this.firestore, 'users', UID), {
+        userInfo,
+      });
       console.log('User info created successfully');
     } catch (error) {
       console.error('Error creating user info:', error);
@@ -32,39 +37,37 @@ export class StoreService {
     }
   }
 
-  //Función para crear datos de la tienda según el UID del usuario.
+  // Function to create store data according to user UID
   async createUserStore(userUID: string, storeInfo: any): Promise<void> {
     try {
       if (!userUID || !storeInfo) {
-        throw new Error('Toda la información es requerida.');
+        throw new Error('All information is required');
       }
 
-      //Creamos un storeId en el mismo codigo
+      // Create a storeId in the code
       const storeId = `${Date.now()}_${userUID}`;
 
-      const storeDoc: AngularFirestoreDocument<any> = this.store.doc(
-        `stores/${storeId}`
-      ); // Corrected path
-      await storeDoc.set({ userUID: userUID, storeInfo: storeInfo });
+      await setDoc(doc(this.firestore, 'stores', storeId), {
+        userUID: userUID,
+        storeInfo: storeInfo,
+      });
       console.log('User Store created successfully!');
     } catch (error) {
-      //Manejo de errores
+      // Error handling
       console.error('Error creating store info: ', error);
       throw error;
     }
   }
 
-  //Función para llamar los datos de un usuario
+  // Function to get user data
   getUserData(uid: string): Observable<UserData> {
     try {
       if (!uid) throw new Error('No UID provided');
 
-      const userDoc: AngularFirestoreDocument<any> = this.store.doc(
-        `users/${uid}`
-      );
-      return userDoc.valueChanges().pipe(
-        map((doc) => {
-          if (!doc) {
+      const userDocRef = doc(this.firestore, 'users', uid);
+      return from(getDoc(userDocRef)).pipe(
+        map((userDoc) => {
+          if (!userDoc.exists()) {
             return {
               UID: uid,
               userInfoData: {
@@ -78,7 +81,7 @@ export class StoreService {
 
           return {
             UID: uid,
-            userInfoData: doc.userInfo || {
+            userInfoData: userDoc.data()?.['userInfo'] || {
               name: '',
               lastName: '',
               rut: '',
@@ -95,18 +98,17 @@ export class StoreService {
 
   getStoreByUID(uid: string): Observable<UserStoreData> {
     try {
-      if (!uid) {
-        throw new Error('No UID provided');
-      }
+      if (!uid) throw new Error('No UID provided');
 
-      const storesCollection: AngularFirestoreCollection<any> =
-        this.store.collection('stores', (ref) =>
-          ref.where('userUID', '==', uid).limit(1)
-        );
+      const q = query(
+        collection(this.firestore, 'stores'),
+        where('userUID', '==', uid),
+        limit(1)
+      );
 
-      return storesCollection.snapshotChanges().pipe(
-        map((actions) => {
-          if (actions.length === 0) {
+      return from(getDocs(q)).pipe(
+        map((querySnapshot) => {
+          if (querySnapshot.empty) {
             return {
               userUID: uid,
               storeInfo: {
@@ -117,12 +119,10 @@ export class StoreService {
             };
           }
 
-          const action = actions[0];
-          const data = action.payload.doc.data();
-
+          const storeDoc = querySnapshot.docs[0];
           return {
             userUID: uid,
-            storeInfo: data.storeInfo || {
+            storeInfo: storeDoc.data()?.['storeInfo'] || {
               bussinessName: '',
               direction: '',
               categories: [],
@@ -132,7 +132,7 @@ export class StoreService {
       );
     } catch (error) {
       console.error('Error getting store data:', error);
-      return from(Promise.reject(error)); // Convert error to Observable
+      throw error;
     }
   }
 }

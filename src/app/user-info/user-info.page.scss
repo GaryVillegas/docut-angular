@@ -1,0 +1,190 @@
+/* Variables reutilizables */
+:root {
+  --input-bg: #f8f9fa;
+  --input-border: #e9ecef;
+  --card-selected-bg: rgba(var(--ion-color-primary-rgb), 0.08);
+}
+
+/* Estructura base optimizada */
+ion-content {
+  --background: #ffffff;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  contain: strict;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 32px); /* Ajuste para padding */
+  overflow: hidden;
+  contain: content;
+
+  /* Animación suave entre slides */
+  transition: transform 0.3s ease;
+}
+
+/* Títulos */
+.title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 24px 0;
+  color: var(--ion-color-primary);
+  contain: content;
+}
+
+/* Grid de opciones */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin: 0 0 24px;
+  contain: content;
+}
+
+.option-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  background: white;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  contain: content;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.selected {
+    border: 2px solid var(--ion-color-primary);
+    background: var(--card-selected-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.option-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--ion-color-primary);
+  contain: content;
+}
+
+/* Inputs optimizados */
+.custom-input {
+  width: 100%;
+  background: var(--input-bg);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  font-size: 1rem;
+  contain: content;
+  transition: all 0.2s ease;
+
+  &.ion-focused {
+    background: white;
+    box-shadow: 0 0 0 2px var(--ion-color-primary);
+  }
+}
+
+/* Grid de categorías optimizado */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+  contain: content;
+
+  ion-chip {
+    margin: 0;
+    justify-content: center;
+    transition: all 0.15s ease;
+    contain: content;
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+}
+
+/* Botones optimizados */
+.buttons-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  contain: content;
+
+  ion-button {
+    margin: 0;
+    height: 48px;
+    font-weight: 500;
+    contain: content;
+
+    &[fill="clear"] {
+      --background-hover: rgba(var(--ion-color-medium-rgb), 0.08);
+    }
+  }
+}
+
+/* Slide final */
+.final-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  contain: content;
+}
+
+.success-icon {
+  font-size: 120px;
+  color: var(--ion-color-primary);
+  margin-bottom: 32px;
+  contain: content;
+}
+
+/* Optimizaciones de rendimiento */
+:host {
+  contain: content;
+}
+
+* {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Efectos de performance para móvil */
+@media (hover: none) {
+  .option-card,
+  ion-chip {
+    &:active {
+      transition: none;
+    }
+  }
+}
+
+/* Ajustes para tablets */
+@media (min-width: 768px) {
+  .options-grid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .custom-input {
+    --padding-top: 16px;
+    --padding-bottom: 16px;
+  }
+}

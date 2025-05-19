@@ -35,7 +35,7 @@ export class RegisterPage implements OnInit {
     try {
       await this.authService.registerAccount(this.email, this.password);
       console.log('register correct');
-      this.route.navigate(['/tabs/home']);
+      this.route.navigate(['/user-info']);
     } catch (error: any) {
       console.log(error);
       if (
