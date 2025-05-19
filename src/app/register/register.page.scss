@@ -1,0 +1,97 @@
+ion-content {
+  --background: #fff; /* White background */
+}
+
+.register-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.register-subtitle {
+  font-size: 16px;
+  color: #666;
+}
+
+.register-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+ion-input {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.register-button {
+  --background: #673ab7; /* Purple color */
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.register-separator {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #888;
+
+  span {
+    position: relative;
+    padding: 0 10px;
+    background-color: #fff;
+
+    &:before,
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 50%;
+      height: 1px;
+      background-color: #ddd;
+      transform: translateY(-50%);
+    }
+
+    &:before {
+      left: 0;
+    }
+
+    &:after {
+      right: 0;
+    }
+  }
+}
+
+.register-google-button {
+  --background: #ffffff; /* White background */
+  color: #212121; /* Darker text color */
+  --border: 1px solid #ddd;
+  font-weight: 500; /* Adjust font weight */
+  border-radius: 8px; /* Add border radius */
+  padding: 0 16px; /* Adjust padding */
+  --padding-start: 10px;
+  --padding-end: 10px;
+
+  ion-icon {
+    color: #db4437; /* Google red color */
+    margin-right: 8px; /* Add spacing between icon and text */
+  }
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 20px;
+
+  a {
+    color: #673ab7; /* Purple color */
+    text-decoration: none;
+  }
+}

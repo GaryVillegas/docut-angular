@@ -5,7 +5,13 @@
       <ion-label>Home</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="store" href="/tabs/store">
+    <ion-tab-button
+      *ngIf="shouldShowStoreTab()"
+      tab="store"
+      href="/tabs/store"
+      class="store-tab"
+      [style.opacity]="isAdmin ? '1' : '0'"
+    >
       <ion-icon name="storefront"></ion-icon>
       <ion-label>Store</ion-label>
     </ion-tab-button>

@@ -1,13 +1,46 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>register</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="ion-padding">
+  <div class="register-container">
+    <div class="register-header">
+      <h2 class="register-subtitle">Únete a nosotros 👋</h2>
+      <h1 class="register-title">Regístrate</h1>
+    </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <ion-input label="Correo" type="email" [(ngModel)]="email"></ion-input>
+
+    <ion-input
+      label="Contraseña"
+      type="password"
+      [(ngModel)]="password"
+    ></ion-input>
+
+    <ion-button
+      expand="block"
+      color="primary"
+      class="register-button"
+      (click)="handleRegister()"
+      >Registrar</ion-button
+    >
+
+    <div class="register-separator">
+      <span>O Regístrate con</span>
+    </div>
+
+    <ion-button
+      expand="block"
+      color="light"
+      class="register-google-button"
+      (click)="googleRegister()"
+    >
+      <ion-icon name="logo-google" slot="start"></ion-icon>
+      Google
+    </ion-button>
+
+    <div class="register-footer">
+      <span>¿Ya tienes una cuenta?</span>
+      <a (click)="goToLogin()"> Inicia Sesión</a>
+      <br />
+      <span>Recuerda leer</span>
+      <a href="#"> Términos y condiciones</a>
+    </div>
+  </div>
 </ion-content>
