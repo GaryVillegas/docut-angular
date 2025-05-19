@@ -1,11 +1,5 @@
 <ion-content [fullscreen]="true">
-  <swiper-container
-    #swiper
-    initial-slide="0"
-    pagination="false"
-    keyboard="true"
-    (swiper-slidechange)="slideChanged()"
-  >
+  <swiper-container #swiper init="false">
     <swiper-slide *ngFor="let slide of slides">
       <div class="slide-content">
         <img [src]="slide.image" [alt]="slide.title" />
@@ -16,26 +10,15 @@
   </swiper-container>
 
   <div class="footer">
-    <div class="indicators">
-      <span
-        *ngFor="let slide of slides; let i = index"
-        class="indicator"
-        [class.active]="currentSlideIndex === i"
-      ></span>
-    </div>
-
     <div class="buttons">
-      <ng-container
+      <ion-button
         *ngIf="currentSlideIndex === slides.length - 1; else nextButtons"
+        expand="block"
+        (click)="skipOnboarding()"
+        class="start-button"
       >
-        <ion-button
-          expand="block"
-          (click)="skipOnboarding()"
-          class="start-button"
-        >
-          Comencemos
-        </ion-button>
-      </ng-container>
+        Comencemos
+      </ion-button>
 
       <ng-template #nextButtons>
         <ion-button fill="clear" (click)="skipOnboarding()" class="skip-button">
