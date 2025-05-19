@@ -4,13 +4,8 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'tabs',
+    redirectTo: 'login',
     pathMatch: 'full',
-  },
-  {
-    path: 'onboard',
-    loadChildren: () =>
-      import('./onboard/onboard.module').then((m) => m.OnboardPageModule),
   },
   {
     path: 'login',
@@ -22,6 +17,30 @@ const routes: Routes = [
     loadChildren: () =>
       import('./tabs/tabs.module').then((m) => m.TabsPageModule),
   },
+  {
+    path: 'home',
+    loadChildren: () =>
+      import('./home/home.module').then((m) => m.HomePageModule),
+  },
+  {
+    path: 'profile',
+    loadChildren: () =>
+      import('./profile/profile.module').then((m) => m.ProfilePageModule),
+  },
+  {
+    path: 'store',
+    loadChildren: () =>
+      import('./store/store.module').then((m) => m.StorePageModule),
+  },
+  {
+    path: 'user-info',
+    loadChildren: () =>
+      import('./user-info/user-info.module').then((m) => m.UserInfoPageModule),
+  },  {
+    path: 'register',
+    loadChildren: () => import('./register/register.module').then( m => m.RegisterPageModule)
+  },
+
 ];
 
 @NgModule({

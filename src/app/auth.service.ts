@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { GoogleAuthProvider } from '@angular/fire/auth';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,15 @@ export class AuthService {
       await this.authServ.signInWithPopup(provider);
     } catch (error) {
       console.error('Error al iniciar sesión con Google:', error);
+    }
+  }
+
+  async logOut() {
+    try {
+      await this.authServ.signOut();
+    } catch (error) {
+      console.error('Error al cerrrar sesion: ', error);
+      throw error;
     }
   }
 }

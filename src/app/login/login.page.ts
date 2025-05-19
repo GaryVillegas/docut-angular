@@ -34,6 +34,7 @@ export class LoginPage implements OnInit {
     try {
       await this.authService.authentication(this.email, this.password);
       console.log('login Correct');
+      this.route.navigate(['/tabs']);
     } catch (error: any) {
       console.log(error);
       if (

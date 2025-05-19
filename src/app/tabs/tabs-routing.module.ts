@@ -6,8 +6,31 @@ import { TabsPage } from './tabs.page';
 const routes: Routes = [
   {
     path: '',
-    component: TabsPage
-  }
+    component: TabsPage,
+    children: [
+      {
+        path: 'home',
+        loadChildren: () =>
+          import('./../home/home-routing.module').then(
+            (m) => m.HomePageRoutingModule
+          ),
+      },
+      {
+        path: 'store',
+        loadChildren: () =>
+          import('./../store/store-routing.module').then(
+            (m) => m.StorePageRoutingModule
+          ),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./../profile/profile-routing.module').then(
+            (m) => m.ProfilePageRoutingModule
+          ),
+      },
+    ],
+  },
 ];
 
 @NgModule({
