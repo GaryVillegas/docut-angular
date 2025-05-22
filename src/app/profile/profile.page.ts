@@ -92,4 +92,8 @@ export class ProfilePage implements OnInit {
         },
       });
   }
+
+  onCreateStore() {
+    this.route.navigate(['/create-store']);
+  }
 }
