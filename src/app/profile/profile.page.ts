@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { StoreService } from '../store.service';
 import { Router } from '@angular/router';
-import { Observable, switchMap, map } from 'rxjs';
-import { UserData, UserStoreData } from '../store';
+import { Observable, switchMap } from 'rxjs';
+import { UserData, UserStoreData } from '../types/store';
 
 @Component({
   selector: 'app-profile',

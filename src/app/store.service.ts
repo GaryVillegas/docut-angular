@@ -9,10 +9,12 @@ import {
   where,
   getDocs,
   limit,
+  updateDoc,
 } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserData, UserStoreData } from './store';
+import { UserData, UserStoreData } from './types/store';
+import { UserInfoPage } from './user-info/user-info.page';
 
 @Injectable({
   providedIn: 'root',
@@ -132,6 +134,19 @@ export class StoreService {
       );
     } catch (error) {
       console.error('Error getting store data:', error);
+      throw error;
+    }
+  }
+
+  async updateUserType(uid: string) {
+    try {
+      const userDocRef = doc(this.firestore, 'users', uid);
+      await updateDoc(userDocRef, {
+        'userInfo.tipe': 'administrador', // Corregido de 'UserInfoPage.tipe' a 'userInfo.tipe'
+      });
+      console.log('Tipo de usuario actualizado con éxito');
+    } catch (error) {
+      console.error('Error al actualizar el tipo de usuario: ', error);
       throw error;
     }
   }

@@ -6,4 +6,65 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
+
+  <!-- filepath: c:\Users\garvi\Desktop\docut-angular\src\app\create-store\create-store.page.html -->
+
+  <!-- Slide 3: Business Information -->
+  <div *ngIf="currentSlideIndex === 2" class="slide">
+    <h2 class="title">Infórmanos sobre tu negocio</h2>
+
+    <ion-input
+      [(ngModel)]="userStoreData.storeInfo.bussinessName"
+      placeholder="Nombre de negocio"
+      class="custom-input"
+    ></ion-input>
+    <ion-input
+      [(ngModel)]="userStoreData.storeInfo.direction"
+      placeholder="Dirección"
+      class="custom-input"
+    ></ion-input>
+
+    <div class="buttons-row">
+      <ion-button expand="block" (click)="nextSlide()">Siguiente</ion-button>
+      <ion-button
+        expand="block"
+        fill="clear"
+        color="medium"
+        (click)="prevSlide()"
+        >Volver</ion-button
+      >
+    </div>
+  </div>
+
+  <!-- Slide 4: Categories -->
+  <div *ngIf="currentSlideIndex === 3" class="slide">
+    <h2 class="title">Elige tus categorías</h2>
+
+    <div class="categories-grid">
+      <ion-chip
+        *ngFor="let category of categories"
+        [color]="isCategorySelected(category) ? 'primary' : 'medium'"
+        (click)="toggleCategory(category)"
+      >
+        {{category}}
+      </ion-chip>
+    </div>
+
+    <div class="buttons-row">
+      <ion-button expand="block" (click)="nextSlide()">Siguiente</ion-button>
+      <ion-button
+        expand="block"
+        fill="clear"
+        color="medium"
+        (click)="prevSlide()"
+        >Volver</ion-button
+      >
+    </div>
+  </div>
+
+  <!-- Slide 5: Final -->
+  <div *ngIf="currentSlideIndex === 4" class="slide final-slide">
+    <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
+    <ion-button expand="block" (click)="handleSubmit()">Finalizar</ion-button>
+  </div>
 </ion-content>
