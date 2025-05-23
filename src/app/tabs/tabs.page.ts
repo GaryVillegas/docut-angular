@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { StoreService } from '../store.service';
 import { AuthService } from '../auth.service';
-import { UserData, UserStoreData } from '../types/store';
+import { UserStoreData } from '../types/store';
+import { UserData } from '../types/user';
 import { Animation, AnimationController } from '@ionic/angular';
 import { Observable, map, switchMap } from 'rxjs';
 

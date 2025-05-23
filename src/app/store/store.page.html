@@ -1,13 +1,44 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>store</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" color="light">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">store</ion-title>
+      <ion-title size="large">Tu tienda</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list [inset]="true">
+    <ion-list-header>
+      <ion-label>{{userStoreData.storeInfo.bussinessName}}</ion-label>
+    </ion-list-header>
+    <ion-item lines="none">
+      <ion-label>{{userStoreData.storeInfo.direction}}</ion-label>
+      <ion-icon name="navigate-circle-outline" slot="start"></ion-icon>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-chip [outline]="true">
+        {{userStoreData.storeInfo.categories[0]}}
+      </ion-chip>
+      <ion-chip [outline]="true">
+        {{userStoreData.storeInfo.categories[1]}}
+      </ion-chip>
+      <ion-icon name="apps-outline" slot="start"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-list-header>
+      <ion-label>Configuracion</ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-label>Config A</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+    <ion-item>
+      <ion-label>Config B</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+    <ion-item>
+      <ion-label>Config C</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  </ion-list>
 </ion-content>

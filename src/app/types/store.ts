@@ -1,15 +1,3 @@
-export interface UserInfoData {
-  name: string;
-  lastName: string;
-  rut: string;
-  tipe: string;
-}
-
-export interface UserData {
-  UID: string;
-  userInfoData: UserInfoData;
-}
-
 export interface StoreInfo {
   bussinessName: string;
   direction: string;
@@ -19,4 +7,12 @@ export interface StoreInfo {
 export interface UserStoreData {
   userUID: string;
   storeInfo: StoreInfo;
+}
+
+export interface Servicio {
+  id: number;
+  nombreServicio: string;
+  descripcionServicio: string;
+  tiempoEstimado: string;
+  precio: number;
 }

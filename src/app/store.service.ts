@@ -13,8 +13,8 @@ import {
 } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserData, UserStoreData } from './types/store';
-import { UserInfoPage } from './user-info/user-info.page';
+import { UserStoreData } from './types/store';
+import { UserData } from './types/user';
 
 @Injectable({
   providedIn: 'root',
@@ -142,7 +142,7 @@ export class StoreService {
     try {
       const userDocRef = doc(this.firestore, 'users', uid);
       await updateDoc(userDocRef, {
-        'userInfo.tipe': 'administrador', // Corregido de 'UserInfoPage.tipe' a 'userInfo.tipe'
+        'userInfo.tipe': 'administrador',
       });
       console.log('Tipo de usuario actualizado con éxito');
     } catch (error) {

@@ -7,10 +7,43 @@
 
   <ion-list [inset]="true">
     <ion-list-header>
+      <ion-label>Tus Datos</ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-icon
+        aria-hidden="true"
+        slot="start"
+        name="person-outline"
+      ></ion-icon>
+      <ion-label
+        >{{userData.userInfoData.name}}
+        {{userData.userInfoData.lastName}}</ion-label
+      >
+    </ion-item>
+    <ion-item>
+      <ion-icon
+        aria-hidden="true"
+        slot="start"
+        name="qr-code-outline"
+      ></ion-icon>
+      <ion-label>{{userData.userInfoData.rut}}</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-icon
+        name="id-card-outline"
+        aria-hidden="true"
+        slot="start"
+      ></ion-icon>
+      <ion-label>{{userData.userInfoData.tipe}}</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-list-header>
       <ion-label>Configuracion</ion-label>
     </ion-list-header>
     <ion-item>
-      <ion-label>Config A</ion-label>
+      <ion-label>Editar Datos</ion-label>
       <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
     </ion-item>
     <ion-item>

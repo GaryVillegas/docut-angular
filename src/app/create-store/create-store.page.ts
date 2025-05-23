@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { StoreService } from '../store.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { UserStoreData, UserData } from '../types/store';
+import { UserStoreData } from '../types/store';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
@@ -18,15 +18,6 @@ import { Router } from '@angular/router';
 })
 export class CreateStorePage {
   currentSlideIndex = 2;
-  userData: UserData = {
-    UID: '',
-    userInfoData: {
-      name: '',
-      lastName: '',
-      rut: '',
-      tipe: '',
-    },
-  };
 
   userStoreData: UserStoreData = {
     userUID: '',

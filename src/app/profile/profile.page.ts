@@ -3,7 +3,8 @@ import { AuthService } from '../auth.service';
 import { StoreService } from '../store.service';
 import { Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
-import { UserData, UserStoreData } from '../types/store';
+import { UserStoreData } from '../types/store';
+import { UserData } from '../types/user';
 
 @Component({
   selector: 'app-profile',
