@@ -13,7 +13,7 @@ import {
 } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserStoreData } from './types/store';
+import { UserStoreData, ServiceData } from './types/store';
 import { UserData } from './types/user';
 
 @Injectable({
@@ -147,6 +147,22 @@ export class StoreService {
       console.log('Tipo de usuario actualizado con éxito');
     } catch (error) {
       console.error('Error al actualizar el tipo de usuario: ', error);
+      throw error;
+    }
+  }
+
+  async createServiceStore(userStoreUID: string, serviceData: ServiceData) {
+    try {
+      if (!userStoreUID || !serviceData) {
+        throw new Error('UID and userInfo are required');
+      }
+
+      await setDoc(doc(this.firestore, 'service', userStoreUID), {
+        serviceData,
+      });
+      console.log('Servico creado.');
+    } catch (error) {
+      console.error('Error al crear el servicio: ', error);
       throw error;
     }
   }

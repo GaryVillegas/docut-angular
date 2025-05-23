@@ -9,10 +9,14 @@ export interface UserStoreData {
   storeInfo: StoreInfo;
 }
 
-export interface Servicio {
-  id: number;
+export interface ServiceStoreData {
   nombreServicio: string;
   descripcionServicio: string;
   tiempoEstimado: string;
   precio: number;
+}
+
+export interface ServiceData {
+  storeId: string;
+  serviceData: ServiceStoreData;
 }

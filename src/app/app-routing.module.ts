@@ -50,6 +50,10 @@ const routes: Routes = [
     path: 'create-store',
     loadChildren: () => import('./create-store/create-store.module').then( m => m.CreateStorePageModule)
   },
+  {
+    path: 'store-service',
+    loadChildren: () => import('./store-service/store-service.module').then( m => m.StoreServicePageModule)
+  },
 
 ];
 

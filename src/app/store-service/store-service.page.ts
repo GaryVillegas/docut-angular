@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ServiceStoreData, UserStoreData, ServiceData } from '../types/store';
 import { StoreService } from '../store.service';
-import { UserStoreData } from '../types/store';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { IonModal } from '@ionic/angular/standalone';
+import { OverlayEventDetail } from '@ionic/core/components';
 
 @Component({
-  selector: 'app-store',
-  templateUrl: './store.page.html',
-  styleUrls: ['./store.page.scss'],
+  selector: 'app-store-service',
+  templateUrl: './store-service.page.html',
+  styleUrls: ['./store-service.page.scss'],
   standalone: false,
 })
-export class StorePage implements OnInit {
+export class StoreServicePage implements OnInit {
+  @ViewChild(IonModal) modal!: IonModal;
+
   userStoreData: UserStoreData = {
     userUID: '',
     storeInfo: {
@@ -21,11 +24,22 @@ export class StorePage implements OnInit {
     },
   };
 
+  serviceStoreData: ServiceStoreData = {
+    nombreServicio: '',
+    descripcionServicio: '',
+    tiempoEstimado: '',
+    precio: 0,
+  };
+
+  serviceData: ServiceData = {
+    storeId: '',
+    serviceData: this.serviceStoreData,
+  };
+
   constructor(
     private storeServ: StoreService,
     private auth: AngularFireAuth,
-    private toast: ToastController,
-    private route: Router
+    private toast: ToastController
   ) {}
 
   ngOnInit() {
@@ -44,9 +58,8 @@ export class StorePage implements OnInit {
     });
   }
 
-  async showToast(header: string, message: string) {
+  async showToast(message: string) {
     const toast = await this.toast.create({
-      header,
       message,
       duration: 3000,
       color: 'success',
@@ -63,9 +76,5 @@ export class StorePage implements OnInit {
       position: 'top',
     });
     await toast.present();
-  }
-
-  goToServiceStore() {
-    this.route.navigate(['store-service']);
   }
 }
