@@ -13,7 +13,7 @@ import {
 } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserStoreData, ServiceData } from './types/store';
+import { UserStoreData, ServiceStoreData, ServiceData } from './types/store';
 import { UserData } from './types/user';
 
 @Injectable({
@@ -57,6 +57,24 @@ export class StoreService {
     } catch (error) {
       // Error handling
       console.error('Error creating store info: ', error);
+      throw error;
+    }
+  }
+
+  async createServiceStore(storeID: string, serviceData: ServiceStoreData) {
+    try {
+      if (!storeID || !serviceData) {
+        throw new Error('UID and userInfo are required');
+      }
+      const serviceId = `${Date.now()}_${storeID}`;
+
+      await setDoc(doc(this.firestore, 'service', serviceId), {
+        storeId: storeID,
+        serviceData: serviceData,
+      });
+      console.log('Servico creado.');
+    } catch (error) {
+      console.error('Error al crear el servicio: ', error);
       throw error;
     }
   }
@@ -138,6 +156,23 @@ export class StoreService {
     }
   }
 
+  async getStoreIdsByUserUID(userUID: string): Promise<string[]> {
+    try {
+      if (!userUID) throw new Error('No UID provided');
+
+      const q = query(
+        collection(this.firestore, 'stores'),
+        where('userUID', '==', userUID)
+      );
+
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map((doc) => doc.id); // Solo retornamos los IDs como strings
+    } catch (error) {
+      console.error('Error getting store IDs:', error);
+      throw error;
+    }
+  }
+
   async updateUserType(uid: string) {
     try {
       const userDocRef = doc(this.firestore, 'users', uid);
@@ -147,22 +182,6 @@ export class StoreService {
       console.log('Tipo de usuario actualizado con éxito');
     } catch (error) {
       console.error('Error al actualizar el tipo de usuario: ', error);
-      throw error;
-    }
-  }
-
-  async createServiceStore(userStoreUID: string, serviceData: ServiceData) {
-    try {
-      if (!userStoreUID || !serviceData) {
-        throw new Error('UID and userInfo are required');
-      }
-
-      await setDoc(doc(this.firestore, 'service', userStoreUID), {
-        serviceData,
-      });
-      console.log('Servico creado.');
-    } catch (error) {
-      console.error('Error al crear el servicio: ', error);
       throw error;
     }
   }

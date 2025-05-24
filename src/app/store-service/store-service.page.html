@@ -14,7 +14,114 @@
 
   <ion-grid>
     <ion-col>
-      <ion-button size="small">Crear Servicios</ion-button>
+      <ion-button size="small" (click)="setOpenCreateModal(true)"
+        >Crear Servicios</ion-button
+      >
     </ion-col>
   </ion-grid>
+
+  <ion-modal [isOpen]="isCreateModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Crear Servicio</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpenCreateModal(false)"
+              >Cancelar</ion-button
+            >
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div *ngIf="currentSlideIndex === 0">
+          <h3></h3>
+          <ion-input
+            [(ngModel)]="serviceStoreData.nombreServicio"
+            placeholder="Nombre de Servicio"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              slot="end"
+              id="btn1"
+              (click)="presentPopover($event, 'btn1')"
+            ></ion-icon
+          ></ion-input>
+          <ion-textarea
+            [(ngModel)]="serviceStoreData.descripcionServicio"
+            placeholder="Descripcion de Servicio"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              slot="end"
+              id="btn2"
+              (click)="presentPopover($event, 'btn2')"
+            ></ion-icon
+          ></ion-textarea>
+          <div class="buttons-row">
+            <ion-button expand="block" (click)="nextSlide()"
+              >Siguiente</ion-button
+            >
+            <ion-button
+              expand="block"
+              fill="clear"
+              color="medium"
+              (click)="prevSlide()"
+              >Volver</ion-button
+            >
+          </div>
+        </div>
+        <div *ngIf="currentSlideIndex === 1">
+          <h3></h3>
+          <ion-input
+            [(ngModel)]="serviceStoreData.precio"
+            placeholder="Precio de Servicio"
+            type="number"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              slot="end"
+              id="btn3"
+              (click)="presentPopover($event, 'btn3')"
+            ></ion-icon
+          ></ion-input>
+          <ion-input
+            [(ngModel)]="serviceStoreData.tiempoEstimado"
+            placeholder="Tiempo Estimado"
+            type="number"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              slot="end"
+              id="btn4"
+              (click)="presentPopover($event, 'btn4')"
+            ></ion-icon
+          ></ion-input>
+          <div class="buttons-row">
+            <ion-button expand="block" (click)="handleSubmit()"
+              >Crear Servicio</ion-button
+            >
+            <ion-button
+              expand="block"
+              fill="clear"
+              color="medium"
+              (click)="prevSlide()"
+              >Volver</ion-button
+            >
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-popover
+    #popover
+    [isOpen]="isOpenPopOver"
+    (didDismiss)="isOpenPopOver = false"
+  >
+    <ng-template>
+      <ion-content class="ion-padding">
+        <p>{{currentPopoverContent}}</p>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
 </ion-content>
