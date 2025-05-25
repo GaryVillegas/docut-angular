@@ -20,3 +20,10 @@ export interface ServiceData {
   storeId: string;
   serviceData: ServiceStoreData;
 }
+
+// NUEVA INTERFAZ: Todo lo que necesita el componente en una sola estructura
+export interface StoreCompleteData {
+  storeInfo: UserStoreData;
+  storeIds: string[];
+  services: ServiceData[];
+}

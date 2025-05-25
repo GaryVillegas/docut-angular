@@ -1,9 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ServiceStoreData, UserStoreData, ServiceData } from '../types/store';
+import {
+  Component,
+  type OnInit,
+  type OnDestroy,
+  ViewChild,
+} from '@angular/core';
+import type { ServiceStoreData, StoreCompleteData } from '../types/store';
 import { StoreService } from '../store.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController } from '@ionic/angular';
-import { IonPopover } from '@ionic/angular/standalone';
+import type { IonPopover } from '@ionic/angular/standalone';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-store-service',
@@ -11,28 +17,43 @@ import { IonPopover } from '@ionic/angular/standalone';
   styleUrls: ['./store-service.page.scss'],
   standalone: false,
 })
-export class StoreServicePage implements OnInit {
+export class StoreServicePage implements OnInit, OnDestroy {
   @ViewChild('popover') popover!: IonPopover;
 
-  userStoreData: UserStoreData = {
-    userUID: '',
+  // 🧹 Para limpiar suscripciones y evitar memory leaks
+  private destroy$ = new Subject<void>();
+
+  // 📊 TODOS los datos que necesita la página en una sola variable
+  storeData: StoreCompleteData = {
     storeInfo: {
-      bussinessName: '',
-      direction: '',
-      categories: [],
+      userUID: '',
+      storeInfo: { bussinessName: '', direction: '', categories: [] },
     },
+    storeIds: [],
+    services: [],
   };
 
-  serviceStoreData: ServiceStoreData = {
+  // 📝 Datos del formulario para crear servicio
+  newService: ServiceStoreData = {
     nombreServicio: '',
     descripcionServicio: '',
     tiempoEstimado: '',
     precio: 0,
   };
 
-  serviceData: ServiceData = {
-    storeId: '',
-    serviceData: this.serviceStoreData,
+  // 🎛️ Estados de la interfaz
+  isCreateModalOpen = false;
+  currentSlideIndex = 0;
+  isLoading = false;
+
+  // 💬 Popover (ayuda)
+  isOpenPopOver = false;
+  currentPopoverContent = '';
+  popoverContents: { [key: string]: string } = {
+    btn1: 'Aqui especificas el nombre del servicio.',
+    btn2: 'Aqui especificas lo que se hacer en el servicio',
+    btn3: 'Aqui se coloca el valor del servico. (sin puntos o comas)',
+    btn4: 'Aqui solo pon el numero de horas que toma el servicio.',
   };
 
   constructor(
@@ -42,39 +63,140 @@ export class StoreServicePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getInfoStore();
-    this.getStoreIds();
-  }
-  storeIds: string[] = [];
-  async getStoreIds() {
-    try {
-      const user = await this.auth.currentUser;
-      if (!user) {
-        this.showAlert('No hay un usuario autenticado.');
-        return;
-      }
-
-      this.storeIds = await this.storeServ.getStoreIdsByUserUID(user.uid);
-      console.log('IDs de tiendas:', this.storeIds);
-    } catch (error) {
-      this.showAlert('Error al obtener los IDs de tiendas');
-      console.error(error);
-    }
+    this.loadData();
   }
 
-  async getInfoStore() {
-    const user = await this.auth.currentUser;
-    if (!user) {
-      this.showAlert('No hay un usuario autenticado.');
-      return;
-    }
-    await this.storeServ.getStoreByUID(user.uid).subscribe((storeData) => {
-      this.userStoreData = storeData;
-      console.log(storeData);
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * 🚀 FUNCIÓN PRINCIPAL - Carga todos los datos
+   * Solo una llamada al servicio, él hace todo el trabajo
+   */
+  private loadData() {
+    this.isLoading = true;
+
+    this.auth.authState.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (user) => {
+        if (!user) {
+          this.showAlert('No estás autenticado');
+          this.isLoading = false;
+          return;
+        }
+
+        // 🎯 UNA SOLA LLAMADA - el servicio hace todo
+        this.storeServ
+          .getCompleteStoreData(user.uid)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (data) => {
+              this.storeData = data;
+              console.log('📊 Datos cargados:', data);
+              this.isLoading = false;
+            },
+            error: (error) => {
+              console.error('❌ Error:', error);
+              this.showAlert('Error al cargar datos');
+              this.isLoading = false;
+            },
+          });
+      },
     });
   }
 
-  async showToast(message: string) {
+  /**
+   * ➕ Crear nuevo servicio
+   */
+  async createService() {
+    // Validar datos
+    if (!this.isValidService()) return;
+
+    this.isLoading = true;
+
+    try {
+      const user = await this.auth.currentUser;
+      if (!user) throw new Error('No estás autenticado');
+
+      // Crear servicio
+      await this.storeServ.createServiceForUser(user.uid, this.newService);
+
+      // Éxito
+      this.showToast('✅ Servicio creado');
+      this.resetForm();
+      this.setOpenCreateModal(false);
+      this.loadData(); // Recargar para mostrar el nuevo servicio
+    } catch (error) {
+      console.error('❌ Error:', error);
+      this.showAlert('Error al crear servicio');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  /**
+   * ✅ Validar datos del servicio
+   */
+  private isValidService(): boolean {
+    if (!this.newService.nombreServicio.trim()) {
+      this.showAlert('Falta el nombre del servicio');
+      return false;
+    }
+    if (!this.newService.descripcionServicio.trim()) {
+      this.showAlert('Falta la descripción');
+      return false;
+    }
+    if (this.newService.precio <= 0) {
+      this.showAlert('El precio debe ser mayor a 0');
+      return false;
+    }
+    if (!this.newService.tiempoEstimado.trim()) {
+      this.showAlert('Falta el tiempo estimado');
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * 🧹 Limpiar formulario
+   */
+  private resetForm() {
+    this.newService = {
+      nombreServicio: '',
+      descripcionServicio: '',
+      tiempoEstimado: '',
+      precio: 0,
+    };
+    this.currentSlideIndex = 0;
+  }
+
+  // 🎛️ Funciones de la interfaz (simples)
+  setOpenCreateModal(isOpen: boolean) {
+    this.isCreateModalOpen = isOpen;
+    if (!isOpen) this.resetForm();
+  }
+
+  nextSlide() {
+    this.currentSlideIndex = 1;
+  }
+
+  prevSlide() {
+    this.currentSlideIndex = 0;
+  }
+
+  handleSubmit() {
+    this.createService();
+  }
+
+  presentPopover(event: Event, buttonId: string) {
+    this.currentPopoverContent = this.popoverContents[buttonId];
+    this.popover.event = event;
+    this.isOpenPopOver = true;
+  }
+
+  // 💬 Notificaciones
+  private async showToast(message: string) {
     const toast = await this.toast.create({
       message,
       duration: 3000,
@@ -84,7 +206,7 @@ export class StoreServicePage implements OnInit {
     await toast.present();
   }
 
-  async showAlert(message: string) {
+  private async showAlert(message: string) {
     const toast = await this.toast.create({
       message,
       duration: 3000,
@@ -92,52 +214,5 @@ export class StoreServicePage implements OnInit {
       position: 'top',
     });
     await toast.present();
-  }
-
-  //Modal Config
-  isCreateModalOpen = false;
-  setOpenCreateModal(isOpen: boolean) {
-    this.isCreateModalOpen = isOpen;
-  }
-
-  //mdoal carrousel input
-  currentSlideIndex = 0;
-  slides = [{ id: '1' }, { id: '2' }];
-  nextSlide() {
-    this.currentSlideIndex++;
-  }
-
-  prevSlide() {
-    this.currentSlideIndex--;
-  }
-
-  async handleSubmit() {
-    await this.storeServ.createServiceStore(
-      this.storeIds[0],
-      this.serviceStoreData
-    );
-    this.showToast('Servicio creado correctamente.');
-    this.setOpenCreateModal(false);
-  }
-
-  //POPOVERS
-  isOpenPopOver = false;
-  currentPopoverContent = '';
-  currentButtonId = '';
-
-  // Datos para cada popover (puedes obtenerlos de una API o servicio)
-  popoverContents: { [key: string]: string } = {
-    btn1: 'Aqui especificas el nombre del servicio.',
-    btn2: 'Aqui especificas lo que se hacer en el servicio',
-    btn3: 'Aqui se coloca el valor del servico. (sin puntos o comas)',
-    btn4: 'Aqui solo pon el numero de horas que toma el servicio.',
-  };
-
-  presentPopover(event: Event, buttonId: string) {
-    this.currentButtonId = buttonId;
-    this.currentPopoverContent =
-      this.popoverContents[buttonId] || 'Contenido predeterminado';
-    this.popover.event = event;
-    this.isOpenPopOver = true;
   }
 }

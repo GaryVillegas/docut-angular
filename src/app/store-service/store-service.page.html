@@ -14,11 +14,45 @@
 
   <ion-grid>
     <ion-col>
-      <ion-button size="small" (click)="setOpenCreateModal(true)"
-        >Crear Servicios</ion-button
-      >
+      <ion-button size="small" (click)="setOpenCreateModal(true)">
+        Crear Servicios
+      </ion-button>
     </ion-col>
   </ion-grid>
+
+  <!-- 🛠️ LISTA DE SERVICIOS - Solo corregida la sintaxis -->
+  <div *ngFor="let service of storeData.services">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{service.serviceData.nombreServicio}}</ion-card-title>
+        <ion-card-subtitle>${{service.serviceData.precio}}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        {{service.serviceData.descripcionServicio}}
+      </ion-card-content>
+
+      <ion-chip [outline]="true">
+        {{service.serviceData.tiempoEstimado}} hr
+      </ion-chip>
+    </ion-card>
+  </div>
+
+  <!-- 📝 Mensaje cuando no hay servicios -->
+  <div
+    *ngIf="storeData.services.length === 0 && !isLoading"
+    class="ion-text-center ion-padding"
+  >
+    <ion-icon name="construct-outline" size="large" color="medium"></ion-icon>
+    <p>No tienes servicios creados</p>
+    <p>¡Crea tu primer servicio!</p>
+  </div>
+
+  <!-- ⏳ Loading -->
+  <div *ngIf="isLoading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>Cargando servicios...</p>
+  </div>
 
   <ion-modal [isOpen]="isCreateModalOpen">
     <ng-template>
@@ -26,9 +60,9 @@
         <ion-toolbar>
           <ion-title>Crear Servicio</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="setOpenCreateModal(false)"
-              >Cancelar</ion-button
-            >
+            <ion-button (click)="setOpenCreateModal(false)">
+              Cancelar
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
@@ -36,7 +70,7 @@
         <div *ngIf="currentSlideIndex === 0">
           <h3></h3>
           <ion-input
-            [(ngModel)]="serviceStoreData.nombreServicio"
+            [(ngModel)]="newService.nombreServicio"
             placeholder="Nombre de Servicio"
           >
             <ion-icon
@@ -44,10 +78,10 @@
               slot="end"
               id="btn1"
               (click)="presentPopover($event, 'btn1')"
-            ></ion-icon
-          ></ion-input>
+            ></ion-icon>
+          </ion-input>
           <ion-textarea
-            [(ngModel)]="serviceStoreData.descripcionServicio"
+            [(ngModel)]="newService.descripcionServicio"
             placeholder="Descripcion de Servicio"
           >
             <ion-icon
@@ -55,25 +89,25 @@
               slot="end"
               id="btn2"
               (click)="presentPopover($event, 'btn2')"
-            ></ion-icon
-          ></ion-textarea>
+            ></ion-icon>
+          </ion-textarea>
           <div class="buttons-row">
-            <ion-button expand="block" (click)="nextSlide()"
-              >Siguiente</ion-button
-            >
+            <ion-button expand="block" (click)="nextSlide()">
+              Siguiente
+            </ion-button>
             <ion-button
               expand="block"
               fill="clear"
               color="medium"
               (click)="prevSlide()"
-              >Volver</ion-button
             >
+              Volver
+            </ion-button>
           </div>
         </div>
         <div *ngIf="currentSlideIndex === 1">
-          <h3></h3>
           <ion-input
-            [(ngModel)]="serviceStoreData.precio"
+            [(ngModel)]="newService.precio"
             placeholder="Precio de Servicio"
             type="number"
           >
@@ -82,10 +116,10 @@
               slot="end"
               id="btn3"
               (click)="presentPopover($event, 'btn3')"
-            ></ion-icon
-          ></ion-input>
+            ></ion-icon>
+          </ion-input>
           <ion-input
-            [(ngModel)]="serviceStoreData.tiempoEstimado"
+            [(ngModel)]="newService.tiempoEstimado"
             placeholder="Tiempo Estimado"
             type="number"
           >
@@ -94,19 +128,20 @@
               slot="end"
               id="btn4"
               (click)="presentPopover($event, 'btn4')"
-            ></ion-icon
-          ></ion-input>
+            ></ion-icon>
+          </ion-input>
           <div class="buttons-row">
-            <ion-button expand="block" (click)="handleSubmit()"
-              >Crear Servicio</ion-button
-            >
+            <ion-button expand="block" (click)="handleSubmit()">
+              Crear Servicio
+            </ion-button>
             <ion-button
               expand="block"
               fill="clear"
               color="medium"
               (click)="prevSlide()"
-              >Volver</ion-button
             >
+              Volver
+            </ion-button>
           </div>
         </div>
       </ion-content>
