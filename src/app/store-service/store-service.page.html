@@ -36,7 +36,12 @@
       <ion-chip [outline]="true" size="small">
         Costo: ${{service.serviceData.precio}}
       </ion-chip>
-      <ion-button size="small">
+      <ion-button
+        size="small"
+        id="option-popover-button"
+        (click)="openServiceOptions($event, service)"
+      >
+        <!-- Añade este click -->
         <ion-icon name="ellipsis-vertical-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-card>
@@ -155,6 +160,27 @@
     <ng-template>
       <ion-content class="ion-padding">
         <p>{{currentPopoverContent}}</p>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+
+  <<ion-popover
+    #optionsPopover
+    [isOpen]="isOptionsPopoverOpen"
+    (didDismiss)="isOptionsPopoverOpen = false"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list lines="none">
+          <ion-item button detail="false" (click)="editCurrentService()">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-item>
+          <ion-item button detail="false" (click)="deleteCurrentService()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-item>
+        </ion-list>
       </ion-content>
     </ng-template>
   </ion-popover>

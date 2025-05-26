@@ -222,4 +222,30 @@ export class StoreServicePage implements OnInit, OnDestroy {
     });
     await toast.present();
   }
+
+  //Serbice options
+  @ViewChild('optionsPopover') optionsPopover!: IonPopover;
+  isOptionsPopoverOpen = false;
+  currentService: any = null;
+
+  openServiceOptions(event: Event, service: any) {
+    this.currentService = service;
+    this.optionsPopover.event = event;
+    this.isOptionsPopoverOpen = true;
+    console.log('Abrir opciones para servicio:', service);
+  }
+
+  editCurrentService() {
+    if (this.currentService) {
+      console.log('Editar servicio:', this.currentService);
+      // Tu lógica de edición aquí
+    }
+  }
+
+  deleteCurrentService() {
+    if (this.currentService) {
+      console.log('Eliminar servicio:', this.currentService);
+      // Tu lógica de eliminación aquí
+    }
+  }
 }
