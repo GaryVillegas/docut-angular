@@ -107,7 +107,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
   }
 
   /**
-   * ➕ Crear nuevo servicio
+   * ➕ Crear nuevo servicio - ALGORITMO ORIGINAL CON STOREID
    */
   async createService() {
     // Validar datos
@@ -119,8 +119,15 @@ export class StoreServicePage implements OnInit, OnDestroy {
       const user = await this.auth.currentUser;
       if (!user) throw new Error('No estás autenticado');
 
-      // Crear servicio
-      await this.storeServ.createServiceForUser(user.uid, this.newService);
+      // 🔥 ALGORITMO ORIGINAL: Obtener storeId primero
+      const storeIds = await this.storeServ.getStoreIdsByUserUID(user.uid);
+
+      if (storeIds.length === 0) {
+        throw new Error('No tienes tiendas creadas');
+      }
+
+      // 🔥 USAR EL MÉTODO ORIGINAL CON STOREID
+      await this.storeServ.createServiceStore(storeIds[0], this.newService);
 
       // Éxito
       this.showToast('✅ Servicio creado');
@@ -139,11 +146,11 @@ export class StoreServicePage implements OnInit, OnDestroy {
    * ✅ Validar datos del servicio
    */
   private isValidService(): boolean {
-    if (!this.newService.nombreServicio.trim()) {
+    if (!this.newService.nombreServicio) {
       this.showAlert('Falta el nombre del servicio');
       return false;
     }
-    if (!this.newService.descripcionServicio.trim()) {
+    if (!this.newService.descripcionServicio) {
       this.showAlert('Falta la descripción');
       return false;
     }
@@ -151,7 +158,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
       this.showAlert('El precio debe ser mayor a 0');
       return false;
     }
-    if (!this.newService.tiempoEstimado.trim()) {
+    if (!this.newService.tiempoEstimado) {
       this.showAlert('Falta el tiempo estimado');
       return false;
     }

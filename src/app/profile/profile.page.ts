@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { StoreService } from '../store.service';
 import { Router } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
-import { UserStoreData } from '../types/store';
-import { UserData } from '../types/user';
+import { of } from 'rxjs';
+import { switchMap, finalize, catchError } from 'rxjs/operators';
+import type { UserStoreData } from '../types/store';
+import type { UserData } from '../types/user';
 
 @Component({
   selector: 'app-profile',
@@ -34,6 +35,11 @@ export class ProfilePage implements OnInit {
 
   isClient = true;
   setDinamicClass = '';
+
+  // 🔄 Estado de loading
+  isLoading = false;
+  loadingError: string | null = null;
+
   constructor(
     private authService: AuthService,
     private route: Router,
@@ -41,57 +47,93 @@ export class ProfilePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.canCreateStore();
+    this.loadUserProfile();
   }
 
   onLogOut() {
-    this.authService.logOut;
+    this.authService.logOut();
     this.route.navigate(['/']);
   }
 
-  canCreateStore() {
+  /**
+   * 🚀 Función optimizada para cargar el perfil del usuario
+   * Usa forkJoin para hacer llamadas paralelas cuando es posible
+   */
+  loadUserProfile() {
+    this.isLoading = true;
+    this.loadingError = null;
+
     this.authService
       .getCurrentUser()
       .pipe(
         switchMap((user) => {
           if (!user?.uid) {
-            return new Observable((subscriber) => subscriber.next(null));
+            throw new Error('Usuario no autenticado');
           }
 
+          // 📊 Cargar datos del usuario primero
           return this.storeServ.getUserData(user.uid).pipe(
             switchMap((userData) => {
               this.userData = userData;
-              console.log(userData);
               this.isClient = userData.userInfoData.tipe === 'cliente';
 
-              // Si el usuario es un 'cliente'
+              console.log('✅ Datos de usuario cargados:', userData);
+
+              // 🏪 Si es cliente, cargar datos de tienda en paralelo
               if (this.isClient) {
-                this.storeServ
-                  .getStoreByUID(user.uid)
-                  .subscribe((storeData) => {
-                    // Si el usuario ya tiene una tienda, esconder el botón
-                    if (storeData.storeInfo.bussinessName) {
-                      this.userStoreData = storeData;
-                      console.log(storeData);
-                      this.setDinamicClass = 'ion-hide';
-                    } else {
-                      this.setDinamicClass = ''; // Mostrar el botón si no tiene tienda
-                    }
-                  });
+                return this.storeServ.getStoreData(user.uid).pipe(
+                  catchError((error) => {
+                    console.warn('⚠️ Error cargando tienda:', error);
+                    return of(this.userStoreData); // Devolver datos vacíos si hay error
+                  })
+                );
               } else {
-                // Si el usuario NO es un 'cliente', siempre esconder el botón
+                // Si no es cliente, no necesita datos de tienda
                 this.setDinamicClass = 'ion-hide';
+                return of(null);
               }
-              return new Observable((subscriber) => subscriber.next(null));
             })
           );
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        }),
+        catchError((error) => {
+          console.error('❌ Error cargando perfil:', error);
+          this.loadingError = 'Error al cargar los datos del perfil';
+          this.isLoading = false;
+          return of(null);
         })
       )
       .subscribe({
+        next: (storeData) => {
+          if (storeData && this.isClient) {
+            this.userStoreData = storeData;
+            console.log('✅ Datos de tienda cargados:', storeData);
+
+            // 🎯 Lógica para mostrar/ocultar botón de crear tienda
+            this.setDinamicClass = storeData.storeInfo.bussinessName
+              ? 'ion-hide'
+              : '';
+          }
+        },
         error: (error) => {
-          console.error('error obteniendo datos: ', error);
+          console.error('❌ Error final:', error);
         },
       });
+  }
+
+  /**
+   * 🔄 Función para recargar datos (útil para pull-to-refresh)
+   */
+  refreshProfile(event?: any) {
+    this.loadUserProfile();
+
+    if (event) {
+      setTimeout(() => {
+        event.target.complete();
+      }, 1000);
+    }
   }
 
   onCreateStore() {

@@ -22,19 +22,23 @@
 
   <!-- 🛠️ LISTA DE SERVICIOS - Solo corregida la sintaxis -->
   <div *ngFor="let service of storeData.services">
-    <ion-card>
+    <ion-card class="ion-padding">
       <ion-card-header>
+        <ion-card-subtitle>
+          Tiempo estimado: {{service.serviceData.tiempoEstimado}} hr
+        </ion-card-subtitle>
         <ion-card-title>{{service.serviceData.nombreServicio}}</ion-card-title>
-        <ion-card-subtitle>${{service.serviceData.precio}}</ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
         {{service.serviceData.descripcionServicio}}
       </ion-card-content>
-
-      <ion-chip [outline]="true">
-        {{service.serviceData.tiempoEstimado}} hr
+      <ion-chip [outline]="true" size="small">
+        Costo: ${{service.serviceData.precio}}
       </ion-chip>
+      <ion-button size="small">
+        <ion-icon name="ellipsis-vertical-outline" slot="icon-only"></ion-icon>
+      </ion-button>
     </ion-card>
   </div>
 
@@ -59,11 +63,6 @@
       <ion-header>
         <ion-toolbar>
           <ion-title>Crear Servicio</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="setOpenCreateModal(false)">
-              Cancelar
-            </ion-button>
-          </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
@@ -99,9 +98,9 @@
               expand="block"
               fill="clear"
               color="medium"
-              (click)="prevSlide()"
+              (click)="setOpenCreateModal(false)"
             >
-              Volver
+              Cancelar
             </ion-button>
           </div>
         </div>
@@ -131,7 +130,7 @@
             ></ion-icon>
           </ion-input>
           <div class="buttons-row">
-            <ion-button expand="block" (click)="handleSubmit()">
+            <ion-button expand="block" (click)="createService()">
               Crear Servicio
             </ion-button>
             <ion-button

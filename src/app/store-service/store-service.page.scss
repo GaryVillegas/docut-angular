@@ -1,0 +1,12 @@
+ion-button {
+  --background: #673ab7;
+  --color: white;
+  --background-activated: #5e4092;
+}
+
+ion-buttons {
+  ion-button {
+    --background: #f6f8fc;
+    --color: #000;
+  }
+}

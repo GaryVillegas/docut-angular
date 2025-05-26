@@ -229,12 +229,25 @@ export class StoreService {
     return this.getStoreIdsAsync(userUID);
   }
 
-  async createServiceStore(
-    storeID: string,
-    serviceData: ServiceStoreData
-  ): Promise<string> {
-    await this.createService(storeID, serviceData);
-    return `${Date.now()}_${storeID}`;
+  async createServiceStore(storeID: string, serviceData: ServiceStoreData) {
+    try {
+      if (!storeID || !serviceData) {
+        throw new Error('UID and userInfo are required');
+      }
+
+      const serviceId = `${Date.now()}_${storeID}`;
+
+      await setDoc(doc(this.firestore, 'service', serviceId), {
+        storeId: storeID,
+
+        serviceData: serviceData,
+      });
+
+      console.log('Servico creado.');
+    } catch (error) {
+      console.error('Error al crear el servicio: ', error);
+      throw error;
+    }
   }
 
   async updateUserType(uid: string): Promise<void> {
