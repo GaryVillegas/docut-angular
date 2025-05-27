@@ -1,17 +1,12 @@
+<ion-header collapse="condense">
+  <ion-toolbar>
+    <ion-title size="default">Tus Servicios</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="/tabs/store"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 <ion-content [fullscreen]="true" color="light">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button default-href="/tabs/store"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="default">Tus Servicios</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <ion-grid>
     <ion-col>
       <ion-button size="small" (click)="setOpenCreateModal(true)">
@@ -33,17 +28,29 @@
       <ion-card-content>
         {{service.serviceData.descripcionServicio}}
       </ion-card-content>
-      <ion-chip [outline]="true" size="small">
-        Costo: ${{service.serviceData.precio}}
-      </ion-chip>
-      <ion-button
-        size="small"
-        id="option-popover-button"
-        (click)="openServiceOptions($event, service)"
-      >
-        <!-- Añade este click -->
-        <ion-icon name="ellipsis-vertical-outline" slot="icon-only"></ion-icon>
-      </ion-button>
+
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-chip [outline]="true" size="small">
+              Costo: ${{service.serviceData.precio}}
+            </ion-chip>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button
+              size="small"
+              id="option-popover-button"
+              (click)="openServiceOptions($event, service)"
+            >
+              <!-- Añade este click -->
+              <ion-icon
+                name="ellipsis-vertical-outline"
+                slot="icon-only"
+              ></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-card>
   </div>
 
@@ -164,7 +171,7 @@
     </ng-template>
   </ion-popover>
 
-  <<ion-popover
+  <ion-popover
     #optionsPopover
     [isOpen]="isOptionsPopoverOpen"
     (didDismiss)="isOptionsPopoverOpen = false"
@@ -184,4 +191,95 @@
       </ion-content>
     </ng-template>
   </ion-popover>
+
+  <ion-modal [isOpen]="isModalServiceOpen">
+    <ng-template>
+      <div *ngIf="currentSlideIndex === 0">
+        <h3></h3>
+        <ion-input
+          [(ngModel)]="editService.nombreServicio"
+          placeholder="Nombre de Servicio"
+        >
+          <ion-icon
+            name="help-circle-outline"
+            slot="end"
+            id="btn1"
+            (click)="presentPopover($event, 'btn1')"
+          ></ion-icon>
+        </ion-input>
+        <ion-textarea
+          [(ngModel)]="editService.descripcionServicio"
+          placeholder="Descripcion de Servicio"
+        >
+          <ion-icon
+            name="help-circle-outline"
+            slot="end"
+            id="btn2"
+            (click)="presentPopover($event, 'btn2')"
+          ></ion-icon>
+        </ion-textarea>
+        <div class="buttons-row">
+          <ion-button expand="block" (click)="nextSlide()">
+            Siguiente
+          </ion-button>
+          <ion-button
+            expand="block"
+            fill="clear"
+            color="medium"
+            (click)="setModalServiceOpen(false)"
+          >
+            Cancelar
+          </ion-button>
+        </div>
+      </div>
+      <div *ngIf="currentSlideIndex === 1">
+        <ion-input
+          [(ngModel)]="editService.precio"
+          placeholder="Precio de Servicio"
+          type="number"
+        >
+          <ion-icon
+            name="help-circle-outline"
+            slot="end"
+            id="btn3"
+            (click)="presentPopover($event, 'btn3')"
+          ></ion-icon>
+        </ion-input>
+        <ion-input
+          [(ngModel)]="editService.tiempoEstimado"
+          placeholder="Tiempo Estimado"
+          type="number"
+        >
+          <ion-icon
+            name="help-circle-outline"
+            slot="end"
+            id="btn4"
+            (click)="presentPopover($event, 'btn4')"
+          ></ion-icon>
+        </ion-input>
+        <div class="buttons-row">
+          <ion-button expand="block" (click)="editServiceData()">
+            Editar Servicio
+          </ion-button>
+          <ion-button
+            expand="block"
+            fill="clear"
+            color="medium"
+            (click)="prevSlide()"
+          >
+            Volver
+          </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-alert
+    [isOpen]="isAlertServiceOpen"
+    header="Elminar Servicio"
+    message="Al eliminar el servicio se eliminara toda la información de este. ¿esta seguro?"
+    [buttons]="alertServiceButtons"
+    (didDismiss)="setAlertServiceOpen(false)"
+  >
+  </ion-alert>
 </ion-content>

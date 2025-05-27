@@ -178,6 +178,16 @@ export class StoreServicePage implements OnInit, OnDestroy {
     this.currentSlideIndex = 0;
   }
 
+  private resetEditForm() {
+    this.editService = {
+      nombreServicio: '',
+      descripcionServicio: '',
+      tiempoEstimado: '',
+      precio: 0,
+    };
+    this.currentSlideIndex = 0;
+  }
+
   // 🎛️ Funciones de la interfaz (simples)
   setOpenCreateModal(isOpen: boolean) {
     this.isCreateModalOpen = isOpen;
@@ -227,6 +237,15 @@ export class StoreServicePage implements OnInit, OnDestroy {
   @ViewChild('optionsPopover') optionsPopover!: IonPopover;
   isOptionsPopoverOpen = false;
   currentService: any = null;
+  isModalServiceOpen = false;
+
+  setModalServiceOpen(isOpen: boolean) {
+    this.isModalServiceOpen = isOpen;
+    if (!isOpen) {
+      this.resetEditForm();
+      this.currentService = null;
+    }
+  }
 
   openServiceOptions(event: Event, service: any) {
     this.currentService = service;
@@ -235,17 +254,88 @@ export class StoreServicePage implements OnInit, OnDestroy {
     console.log('Abrir opciones para servicio:', service);
   }
 
+  // ✏️ Datos del formulario para editar servicio
+  editService: ServiceStoreData = {
+    nombreServicio: '',
+    descripcionServicio: '',
+    tiempoEstimado: '',
+    precio: 0,
+  };
+
   editCurrentService() {
     if (this.currentService) {
       console.log('Editar servicio:', this.currentService);
-      // Tu lógica de edición aquí
+      this.editService = {
+        nombreServicio: this.currentService.serviceData.nombreServicio || '',
+        descripcionServicio:
+          this.currentService.serviceData.descripcionServicio || '',
+        tiempoEstimado: this.currentService.serviceData.tiempoEstimado || '',
+        precio: this.currentService.serviceData.precio || 0,
+      };
+      this.setModalServiceOpen(true);
     }
   }
+
+  async editServiceData() {
+    if (this.currentService && this.currentService.documentId) {
+      try {
+        await this.storeServ.updateService(
+          this.currentService.documentId,
+          this.editService
+        );
+        this.setModalServiceOpen(false);
+        this.resetEditForm();
+        this.showToast('✅ Servicio editado');
+      } catch (error) {
+        console.error('Error al actualizar el servicio:', error);
+      }
+    }
+  }
+
+  //delete service
+  isAlertServiceOpen = false;
+  setAlertServiceOpen(isOpen: boolean) {
+    this.isAlertServiceOpen = isOpen;
+  }
+
+  public alertServiceButtons = [
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => {
+        this.setAlertServiceOpen(false);
+      },
+    },
+    {
+      text: 'Si',
+      role: 'confirm',
+      handler: () => {
+        this.deleteService();
+      },
+    },
+  ];
 
   deleteCurrentService() {
     if (this.currentService) {
       console.log('Eliminar servicio:', this.currentService);
-      // Tu lógica de eliminación aquí
+      this.setAlertServiceOpen(true);
+    }
+  }
+
+  async deleteService() {
+    if (this.currentService && this.currentService.documentId) {
+      try {
+        await this.storeServ.delteService(this.currentService.documentId);
+        this.setAlertServiceOpen(false);
+        this.isOptionsPopoverOpen = false;
+        this.showToast('✅ Servicio eliminado');
+        this.loadData(); // Recargar para reflejar cambios
+      } catch (error) {
+        console.error('Error al eliminar el servicio:', error);
+        this.showAlert('Error al eliminar servicio');
+      }
+    } else {
+      this.showAlert('No se pudo identificar el servicio a eliminar');
     }
   }
 }

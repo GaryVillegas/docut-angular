@@ -10,6 +10,7 @@ import {
   getDocs,
   limit,
   updateDoc,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import { from, type Observable, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
@@ -18,6 +19,7 @@ import type {
   ServiceStoreData,
   ServiceData,
   StoreCompleteData,
+  getServiceData,
 } from './types/store';
 import type { UserData } from './types/user';
 
@@ -112,7 +114,7 @@ export class StoreService {
   /**
    * 📋 Busca servicios de una tienda específica
    */
-  private getServicesByStoreId(storeId: string): Observable<ServiceData[]> {
+  private getServicesByStoreId(storeId: string): Observable<getServiceData[]> {
     const q = query(
       collection(this.firestore, 'service'),
       where('storeId', '==', storeId)
@@ -123,9 +125,10 @@ export class StoreService {
         const services = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
+            documentId: doc.id,
             storeId: data['storeId'],
             serviceData: data['serviceData'],
-          } as ServiceData;
+          } as getServiceData;
         });
         console.log('✅ Servicios encontrados:', services.length);
         return services;
@@ -253,5 +256,31 @@ export class StoreService {
   async updateUserType(uid: string): Promise<void> {
     const userDocRef = doc(this.firestore, 'users', uid);
     await updateDoc(userDocRef, { 'userInfo.tipe': 'administrador' });
+  }
+
+  async updateService(
+    documentId: string,
+    serviceData: ServiceStoreData
+  ): Promise<void> {
+    try {
+      const serviceDocRef = doc(this.firestore, 'service', documentId);
+      await updateDoc(serviceDocRef, {
+        serviceData: serviceData,
+      });
+      console.log('✅ Servicio actualizado:', documentId);
+    } catch (error) {
+      console.error('❌ Error actualizando servicio:', error);
+      throw error;
+    }
+  }
+
+  async delteService(documentId: string) {
+    try {
+      await deleteDoc(doc(this.firestore, 'service', documentId));
+      console.log('✅ Servicio eliminado:', documentId);
+    } catch (error) {
+      console.error('❌ Error eliminar servicio:', error);
+      throw error;
+    }
   }
 }
