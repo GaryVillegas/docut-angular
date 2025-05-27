@@ -49,8 +49,15 @@
     </ion-item>
   </ion-list>
 
-  <ion-button (click)="onLogOut()"> Cerrar Sesión </ion-button>
-  <ion-button [class]="setDinamicClass" (click)="onCreateStore()">
+  <ion-button
+    [class]="setDinamicClass"
+    (click)="onCreateStore()"
+    expand="block"
+  >
+    <ion-icon name="add-outline" slot="start"></ion-icon>
     Crear Tienda
+  </ion-button>
+  <ion-button (click)="onLogOut()" expand="block" class="logout">
+    <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar Sesión
   </ion-button>
 </ion-content>

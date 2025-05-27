@@ -325,7 +325,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
   async deleteService() {
     if (this.currentService && this.currentService.documentId) {
       try {
-        await this.storeServ.delteService(this.currentService.documentId);
+        await this.storeServ.deleteService(this.currentService.documentId);
         this.setAlertServiceOpen(false);
         this.isOptionsPopoverOpen = false;
         this.showToast('✅ Servicio eliminado');

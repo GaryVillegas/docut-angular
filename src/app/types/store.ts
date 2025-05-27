@@ -9,6 +9,12 @@ export interface UserStoreData {
   storeInfo: StoreInfo;
 }
 
+export interface getUserStoreData {
+  userUID: string;
+  documentId: string;
+  storeInfo: StoreInfo;
+}
+
 export interface ServiceStoreData {
   nombreServicio: string;
   descripcionServicio: string;

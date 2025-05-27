@@ -33,6 +33,14 @@ ion-card[color="danger"] {
   }
 }
 
+.logout {
+  --background: #d01e1e;
+  --background-hover: #d01e1e;
+  --background-activated: #a01e1e;
+  --background-focused: #a01e1e;
+  --background: #d01e1e;
+}
+
 // Animación suave para el contenido
 .content-fade-in {
   animation: fadeIn 0.3s ease-in;

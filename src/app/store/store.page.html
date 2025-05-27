@@ -34,4 +34,27 @@
       <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
     </ion-item>
   </ion-list>
+
+  <ion-grid [fixed]="true">
+    <ion-row>
+      <ion-col>
+        <ion-button
+          expand="block"
+          class="deleteButton"
+          (click)="setAlertDeleteOpen(true)"
+        >
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          eliminar tienda
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-alert
+    [isOpen]="isAlertDeleteOpen"
+    header="Eliminar Tienda"
+    message="Al eliminar tienda se borraran todos los datos de la tienda."
+    [buttons]="alertDeleteButtons"
+    (didDismiss)="setAlertDeleteOpen(false)"
+  ></ion-alert>
 </ion-content>

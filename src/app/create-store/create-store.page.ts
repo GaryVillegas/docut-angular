@@ -80,7 +80,7 @@ export class CreateStorePage {
 
     try {
       // Actualiza el tipo de usuario primero
-      await this.storeServ.updateUserType(user.uid);
+      await this.storeServ.updateUserType(user.uid, 'administrador');
 
       // Establece el UID en los datos de la tienda
       this.userStoreData.userUID = user.uid;

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StoreService } from '../store.service';
-import { UserStoreData } from '../types/store';
+import { getUserStoreData } from '../types/store';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -12,8 +12,9 @@ import { Router } from '@angular/router';
   standalone: false,
 })
 export class StorePage implements OnInit {
-  userStoreData: UserStoreData = {
+  userStoreData: getUserStoreData = {
     userUID: '',
+    documentId: '',
     storeInfo: {
       bussinessName: '',
       direction: '',
@@ -67,5 +68,43 @@ export class StorePage implements OnInit {
 
   goToServiceStore() {
     this.route.navigate(['store-service']);
+  }
+
+  isAlertDeleteOpen = false;
+  setAlertDeleteOpen(isOpen: boolean) {
+    this.isAlertDeleteOpen = isOpen;
+    console.log(isOpen);
+  }
+
+  public alertDeleteButtons = [
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => {
+        this.setAlertDeleteOpen(false);
+      },
+    },
+    {
+      text: 'Si',
+      role: 'confirm',
+      handler: () => {
+        this.deleteStore();
+      },
+    },
+  ];
+
+  async deleteStore() {
+    try {
+      await this.storeServ.deleteStore(this.userStoreData.documentId);
+      await this.storeServ.updateUserType(
+        this.userStoreData.userUID,
+        'cliente'
+      );
+      this.setAlertDeleteOpen(false);
+      this.showToast('Exito', '✅ Tienda Eliminada');
+    } catch (error) {
+      console.error('❌ Error eliminar tienda:', error);
+      this.showAlert('❌ Error eliminar tienda');
+    }
   }
 }

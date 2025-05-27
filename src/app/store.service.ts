@@ -15,7 +15,7 @@ import {
 import { from, type Observable, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import type {
-  UserStoreData,
+  getUserStoreData,
   ServiceStoreData,
   ServiceData,
   StoreCompleteData,
@@ -33,7 +33,7 @@ export class StoreService {
    * 🏪 SOLO DATOS DE LA TIENDA - Para store.page.ts
    * Función simple que solo trae información básica de la tienda
    */
-  getStoreData(userUID: string): Observable<UserStoreData> {
+  getStoreData(userUID: string): Observable<getUserStoreData> {
     console.log('🏪 Buscando datos de tienda para:', userUID);
 
     const q = query(
@@ -44,13 +44,15 @@ export class StoreService {
 
     return from(getDocs(q)).pipe(
       map((querySnapshot) => {
-        const storeData: UserStoreData = querySnapshot.empty
+        const storeData: getUserStoreData = querySnapshot.empty
           ? {
               userUID,
+              documentId: '',
               storeInfo: { bussinessName: '', direction: '', categories: [] },
             }
           : {
               userUID,
+              documentId: querySnapshot.docs[0].id,
               storeInfo: querySnapshot.docs[0].data()?.['storeInfo'] || {
                 bussinessName: '',
                 direction: '',
@@ -224,7 +226,7 @@ export class StoreService {
   }
 
   // Mantener para compatibilidad
-  getStoreByUID(uid: string): Observable<UserStoreData> {
+  getStoreByUID(uid: string): Observable<getUserStoreData> {
     return this.getStoreData(uid);
   }
 
@@ -253,9 +255,9 @@ export class StoreService {
     }
   }
 
-  async updateUserType(uid: string): Promise<void> {
+  async updateUserType(uid: string, type: string): Promise<void> {
     const userDocRef = doc(this.firestore, 'users', uid);
-    await updateDoc(userDocRef, { 'userInfo.tipe': 'administrador' });
+    await updateDoc(userDocRef, { 'userInfo.tipe': type });
   }
 
   async updateService(
@@ -274,12 +276,34 @@ export class StoreService {
     }
   }
 
-  async delteService(documentId: string) {
+  async deleteService(documentId: string) {
     try {
       await deleteDoc(doc(this.firestore, 'service', documentId));
       console.log('✅ Servicio eliminado:', documentId);
     } catch (error) {
       console.error('❌ Error eliminar servicio:', error);
+      throw error;
+    }
+  }
+
+  async deleteStore(documentId: string) {
+    try {
+      const servicesQuery = query(
+        collection(this.firestore, 'service'),
+        where('storeId', '==', documentId)
+      );
+      const servicesSnapshot = await getDocs(servicesQuery);
+      const deleteServicePromises = servicesSnapshot.docs.map((serviceDoc) =>
+        deleteDoc(doc(this.firestore, 'service', serviceDoc.id))
+      );
+      await Promise.all(deleteServicePromises);
+      console.log(
+        `✅ ${servicesSnapshot.docs.length} servicios eliminados para la tienda: ${documentId}`
+      );
+      await deleteDoc(doc(this.firestore, 'stores', documentId));
+      console.log('✅ Tienda eliminado:', documentId);
+    } catch (error) {
+      console.error('❌ Error eliminar tienda:', error);
       throw error;
     }
   }
