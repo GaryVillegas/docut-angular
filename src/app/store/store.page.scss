@@ -1,0 +1,32 @@
+.deleteButton {
+  --background: #d01e1e;
+  --background-hover: #d01e1e;
+  --background-activated: #a01e1e;
+  --background-focused: #a01e1e;
+  --background: #d01e1e;
+}
+
+ion-input {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+ion-modal {
+  ion-button {
+    --background: #673ab7;
+    --color: white;
+    --background-activated: #5e4092;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+
+  ion-buttons {
+    ion-button {
+      --background: var(--ion-color-light);
+      --color: var(--ion-color-primary);
+    }
+  }
+}

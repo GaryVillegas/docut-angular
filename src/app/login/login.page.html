@@ -13,31 +13,20 @@
       [(ngModel)]="password"
     ></ion-input>
 
-    <ion-button
-      expand="block"
-      color="primary"
-      class="login-button"
-      (click)="handleLogin()"
-      >Ingresar</ion-button
-    >
+    <ion-button expand="block" (click)="handleLogin()">Ingresar</ion-button>
 
     <div class="separator">
       <span>O Inicia Sesión con</span>
     </div>
 
-    <ion-button
-      expand="block"
-      color="light"
-      class="google-button"
-      (click)="googleLogin()"
-    >
+    <ion-button expand="block" color="light" (click)="googleLogin()">
       <ion-icon name="logo-google" slot="start"></ion-icon>
       Google
     </ion-button>
 
     <div class="footer">
       <span>¿No tienes una cuenta?</span>
-      <a href="#"> Regístrate</a>
+      <a (click)="goToRegister()"> Regístrate</a>
       <br />
       <span>Recuerda leer</span>
       <a href="#"> Términos y condiciones</a>

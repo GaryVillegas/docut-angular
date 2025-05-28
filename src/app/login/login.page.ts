@@ -34,10 +34,15 @@ export class LoginPage implements OnInit {
     try {
       await this.authService.authentication(this.email, this.password);
       console.log('login Correct');
-      this.route.navigate(['/tabs']);
+      this.route.navigate(['/tabs/home']);
     } catch (error: any) {
       console.log(error);
-      if (
+      if (error.code === 'auth/invalid-credential') {
+        this.presentToast(
+          'Error de credenciales',
+          'Las credenciales proporcionadas son incorrectas o han expirado.'
+        );
+      } else if (
         error.code === 'auth/invalid-credential' ||
         error.code === 'auth/wrong-password'
       ) {
@@ -64,7 +69,7 @@ export class LoginPage implements OnInit {
       await this.authService.loginWithGoogle();
       console.log('Se logue correctamente');
       setTimeout(() => {
-        this.route.navigate(['']);
+        this.route.navigate(['/tabs/home']);
       }, 1500);
     } catch (error: any) {
       console.log(error);
@@ -89,6 +94,6 @@ export class LoginPage implements OnInit {
   }
 
   goToRegister() {
-    this.route.navigate(['']);
+    this.route.navigate(['/register']);
   }
 }

@@ -32,7 +32,6 @@ ion-content {
   font-weight: 600;
   text-align: center;
   margin: 24px 0;
-  color: var(--ion-color-primary);
   contain: content;
 }
 
@@ -116,24 +115,10 @@ ion-content {
   }
 }
 
-/* Botones optimizados */
-.buttons-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: auto;
-  contain: content;
-
-  ion-button {
-    margin: 0;
-    height: 48px;
-    font-weight: 500;
-    contain: content;
-
-    &[fill="clear"] {
-      --background-hover: rgba(var(--ion-color-medium-rgb), 0.08);
-    }
-  }
+ion-button {
+  --background: #673ab7;
+  --color: white;
+  --background-activated: #5e4092;
 }
 
 /* Slide final */
@@ -148,7 +133,7 @@ ion-content {
 
 .success-icon {
   font-size: 120px;
-  color: var(--ion-color-primary);
+  color: #673ab7;
   margin-bottom: 32px;
   contain: content;
 }

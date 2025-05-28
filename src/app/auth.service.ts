@@ -1,19 +1,25 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { GoogleAuthProvider } from '@angular/fire/auth';
-import { throwError } from 'rxjs';
+import {
+  GoogleAuthProvider,
+  Auth,
+  browserLocalPersistence,
+  setPersistence,
+} from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private authServ: AngularFireAuth) {}
+  constructor(private authServ: AngularFireAuth, private auth: Auth) {}
 
   async authentication(email: string, password: string) {
     try {
+      await setPersistence(this.auth, browserLocalPersistence);
       await this.authServ.signInWithEmailAndPassword(email, password);
     } catch (error) {
       console.error('error al registrar cuenta: ', error);
+      throw error;
     }
   }
 
@@ -41,5 +47,9 @@ export class AuthService {
       console.error('Error al cerrrar sesion: ', error);
       throw error;
     }
+  }
+
+  getCurrentUser() {
+    return this.authServ.authState;
   }
 }

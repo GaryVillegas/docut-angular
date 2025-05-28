@@ -1,13 +1,105 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>store</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" color="light">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">store</ion-title>
+      <ion-title size="large">Tu tienda</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list [inset]="true">
+    <ion-list-header>
+      <ion-label>{{userStoreData.storeInfo.bussinessName}}</ion-label>
+    </ion-list-header>
+    <ion-item lines="none">
+      <ion-label>{{userStoreData.storeInfo.direction}}</ion-label>
+      <ion-icon name="navigate-circle-outline" slot="start"></ion-icon>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-chip [outline]="true">
+        {{userStoreData.storeInfo.categories[0]}}
+      </ion-chip>
+      <ion-chip [outline]="true">
+        {{userStoreData.storeInfo.categories[1]}}
+      </ion-chip>
+      <ion-icon name="grid-outline" slot="start"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-list-header>
+      <ion-label>Configuracion</ion-label>
+    </ion-list-header>
+    <ion-item (click)="goToServiceStore()" lines="none">
+      <ion-icon name="reader-outline" slot="start"></ion-icon>
+      <ion-label>Servicios</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+    <ion-item lines="none" (click)="setModalSettingsOpen(true)">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      <ion-label>Editar Tienda</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-icon name="star-half-outline" slot="start"></ion-icon>
+      <ion-label>Ver Criticas</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <ion-grid [fixed]="true">
+    <ion-row>
+      <ion-col>
+        <ion-button
+          expand="block"
+          class="deleteButton"
+          (click)="setAlertDeleteOpen(true)"
+        >
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          eliminar tienda
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-modal [isOpen]="isModalSettingsOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar Tienda</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setModalSettingsOpen(false)">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-input
+          [(ngModel)]="this.userStoreData.storeInfo.bussinessName"
+          placeholder="Nombre de negocio"
+        ></ion-input>
+        <ion-input
+          [(ngModel)]="this.userStoreData.storeInfo.direction"
+          placeholder="Nombre de negocio"
+        ></ion-input>
+        <div class="categories-grid">
+          <ion-chip
+            *ngFor="let category of categories"
+            [color]="isCategorySelected(category) ? 'primary' : 'medium'"
+            (click)="toggleCategory(category)"
+          >
+            {{category}}
+          </ion-chip>
+        </div>
+        <ion-button expand="block" (click)="updateStore()"
+          >Actualizar</ion-button
+        >
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-alert
+    [isOpen]="isAlertDeleteOpen"
+    header="Eliminar Tienda"
+    message="Al eliminar tienda se borraran todos los datos de la tienda."
+    [buttons]="alertDeleteButtons"
+    (didDismiss)="setAlertDeleteOpen(false)"
+  ></ion-alert>
 </ion-content>
