@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { StoreService } from '../store.service';
 import { getUserStoreData } from '../types/store';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
@@ -26,7 +26,8 @@ export class StorePage implements OnInit {
     private storeServ: StoreService,
     private auth: AngularFireAuth,
     private toast: ToastController,
-    private route: Router
+    private route: Router,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -111,5 +112,44 @@ export class StorePage implements OnInit {
   isModalSettingsOpen = false;
   setModalSettingsOpen(isOpenSetting: boolean) {
     this.isModalSettingsOpen = isOpenSetting;
+  }
+
+  categories = [
+    'Barbería',
+    'Canina',
+    'Spa',
+    'Salón de Belleza',
+    'Peluquería',
+    'Manicure',
+    'Pedicure',
+    'Depilación',
+  ];
+
+  toggleCategory(category: string) {
+    const index = this.userStoreData.storeInfo?.categories.indexOf(category);
+    if (index > -1) {
+      this.userStoreData.storeInfo?.categories.splice(index, 1);
+    } else {
+      this.userStoreData.storeInfo.categories.push(category);
+    }
+    this.cdRef.markForCheck();
+  }
+
+  isCategorySelected(category: string): boolean {
+    return this.userStoreData.storeInfo.categories.includes(category);
+  }
+
+  async updateStore() {
+    try {
+      await this.storeServ.updateStore(
+        this.userStoreData.documentId,
+        this.userStoreData.storeInfo
+      );
+      this.showToast('Exito', '✅ Tienda actualizada');
+      this.setModalSettingsOpen(false);
+    } catch (erro) {
+      console.error('❌ Error eliminar tienda:', erro);
+      this.showAlert('❌ Error al actualizar tienda');
+    }
   }
 }

@@ -20,6 +20,7 @@ import type {
   ServiceData,
   StoreCompleteData,
   getServiceData,
+  StoreInfo,
 } from './types/store';
 import type { UserData, UserInfoData } from './types/user';
 
@@ -283,6 +284,19 @@ export class StoreService {
       console.log('✅ Servicio actualizado:', documentId);
     } catch (error) {
       console.error('❌ Error actualizando servicio:', error);
+      throw error;
+    }
+  }
+
+  async updateStore(storeId: string, storeData: StoreInfo) {
+    try {
+      const storeDocRef = doc(this.firestore, 'stores', storeId);
+      await updateDoc(storeDocRef, {
+        storeInfo: storeData,
+      });
+      console.log('✅ Tienda actualizada:', storeId);
+    } catch (error) {
+      console.error('❌ Error actualizando tienda:', error);
       throw error;
     }
   }

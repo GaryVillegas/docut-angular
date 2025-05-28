@@ -64,19 +64,33 @@
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Modal</ion-title>
+          <ion-title>Editar Tienda</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="setModalSettingsOpen(false)">Close</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni illum
-          quidem recusandae ducimus quos reprehenderit. Veniam, molestias quos,
-          dolorum consequuntur nisi deserunt omnis id illo sit cum qui. Eaque,
-          dicta.
-        </p>
+        <ion-input
+          [(ngModel)]="this.userStoreData.storeInfo.bussinessName"
+          placeholder="Nombre de negocio"
+        ></ion-input>
+        <ion-input
+          [(ngModel)]="this.userStoreData.storeInfo.direction"
+          placeholder="Nombre de negocio"
+        ></ion-input>
+        <div class="categories-grid">
+          <ion-chip
+            *ngFor="let category of categories"
+            [color]="isCategorySelected(category) ? 'primary' : 'medium'"
+            (click)="toggleCategory(category)"
+          >
+            {{category}}
+          </ion-chip>
+        </div>
+        <ion-button expand="block" (click)="updateStore()"
+          >Actualizar</ion-button
+        >
       </ion-content>
     </ng-template>
   </ion-modal>
