@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { switchMap, finalize, catchError } from 'rxjs/operators';
 import type { UserStoreData } from '../types/store';
 import type { UserData } from '../types/user';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-profile',
@@ -43,7 +44,8 @@ export class ProfilePage implements OnInit {
   constructor(
     private authService: AuthService,
     private route: Router,
-    private storeServ: StoreService
+    private storeServ: StoreService,
+    private toast: ToastController
   ) {}
 
   ngOnInit() {
@@ -136,7 +138,48 @@ export class ProfilePage implements OnInit {
     }
   }
 
+  //User modal
+  isModalUserOpen = false;
+  setModalUserOpen(isOpen: boolean) {
+    this.isModalUserOpen = isOpen;
+  }
+
+  async updateUserData() {
+    try {
+      await this.storeServ.updateUser(
+        this.userData.UID,
+        this.userData.userInfoData
+      );
+      this.showToast('Exito', '✅ Usuario editado con exito.');
+      this.setModalUserOpen(false);
+    } catch (error) {
+      this.showAlert('❌ Error al editar usuario.');
+      console.log('error al editar usuario: ', error);
+    }
+  }
+
   onCreateStore() {
     this.route.navigate(['/create-store']);
+  }
+
+  async showToast(header: string, message: string) {
+    const toast = await this.toast.create({
+      header,
+      message,
+      duration: 3000,
+      color: 'success',
+      position: 'top',
+    });
+    await toast.present();
+  }
+
+  async showAlert(message: string) {
+    const toast = await this.toast.create({
+      message,
+      duration: 3000,
+      color: 'danger',
+      position: 'top',
+    });
+    await toast.present();
   }
 }

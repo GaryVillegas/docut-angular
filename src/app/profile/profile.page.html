@@ -42,7 +42,7 @@
     <ion-list-header>
       <ion-label>Configuracion</ion-label>
     </ion-list-header>
-    <ion-item lines="none">
+    <ion-item lines="none" (click)="setModalUserOpen(true)">
       <ion-icon name="pencil-outline" slot="start"></ion-icon>
       <ion-label>Editar Datos</ion-label>
       <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
@@ -60,4 +60,43 @@
   <ion-button (click)="onLogOut()" expand="block" class="logout">
     <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar Sesión
   </ion-button>
+
+  <ion-modal [isOpen]="isModalUserOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar Perfil</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setModalUserOpen(false)">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-input [(ngModel)]="userData.userInfoData.name">
+          <ion-icon
+            aria-hidden="true"
+            slot="start"
+            name="person-outline"
+          ></ion-icon>
+        </ion-input>
+        <ion-input [(ngModel)]="userData.userInfoData.lastName">
+          <ion-icon
+            aria-hidden="true"
+            slot="start"
+            name="person-outline"
+          ></ion-icon>
+        </ion-input>
+        <ion-input [(ngModel)]="userData.userInfoData.rut">
+          <ion-icon
+            aria-hidden="true"
+            slot="start"
+            name="qr-code-outline"
+          ></ion-icon>
+        </ion-input>
+        <ion-button (click)="updateUserData()" expand="block">
+          Editar Usuario
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

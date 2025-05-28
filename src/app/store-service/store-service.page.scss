@@ -10,3 +10,12 @@ ion-buttons {
     --color: #000;
   }
 }
+
+ion-input,
+ion-textarea {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}

@@ -21,7 +21,7 @@ import type {
   StoreCompleteData,
   getServiceData,
 } from './types/store';
-import type { UserData } from './types/user';
+import type { UserData, UserInfoData } from './types/user';
 
 @Injectable({
   providedIn: 'root',
@@ -258,6 +258,17 @@ export class StoreService {
   async updateUserType(uid: string, type: string): Promise<void> {
     const userDocRef = doc(this.firestore, 'users', uid);
     await updateDoc(userDocRef, { 'userInfo.tipe': type });
+  }
+
+  async updateUser(uid: string, userInfo: UserInfoData) {
+    try {
+      const userDocRef = doc(this.firestore, 'users', uid);
+      await updateDoc(userDocRef, { userInfo });
+      console.log('✅ Usuario actualizado:', uid);
+    } catch (error) {
+      console.error('❌ Error actualizando usuario:', error);
+      throw error;
+    }
   }
 
   async updateService(
