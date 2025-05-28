@@ -285,6 +285,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
         );
         this.setModalServiceOpen(false);
         this.resetEditForm();
+        this.loadData();
         this.showToast('✅ Servicio editado');
       } catch (error) {
         console.error('Error al actualizar el servicio:', error);

@@ -20,7 +20,7 @@
       <ion-chip [outline]="true">
         {{userStoreData.storeInfo.categories[1]}}
       </ion-chip>
-      <ion-icon name="apps-outline" slot="start"></ion-icon>
+      <ion-icon name="grid-outline" slot="start"></ion-icon>
     </ion-item>
   </ion-list>
 
@@ -31,6 +31,16 @@
     <ion-item (click)="goToServiceStore()" lines="none">
       <ion-icon name="reader-outline" slot="start"></ion-icon>
       <ion-label>Servicios</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+    <ion-item lines="none" (click)="setModalSettingsOpen(true)">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      <ion-label>Editar Tienda</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-icon name="star-half-outline" slot="start"></ion-icon>
+      <ion-label>Ver Criticas</ion-label>
       <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
     </ion-item>
   </ion-list>
@@ -49,6 +59,27 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+
+  <ion-modal [isOpen]="isModalSettingsOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Modal</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setModalSettingsOpen(false)">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni illum
+          quidem recusandae ducimus quos reprehenderit. Veniam, molestias quos,
+          dolorum consequuntur nisi deserunt omnis id illo sit cum qui. Eaque,
+          dicta.
+        </p>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
   <ion-alert
     [isOpen]="isAlertDeleteOpen"

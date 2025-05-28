@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" color="light" class="ion-padding">
+<ion-content [fullscreen]="true" color="light">
   <ion-list [inset]="true" lines="none">
     <ion-list-header>
       <ion-label>Tus Datos</ion-label>
@@ -49,17 +49,28 @@
     </ion-item>
   </ion-list>
 
-  <ion-button
-    [class]="setDinamicClass"
-    (click)="onCreateStore()"
-    expand="block"
-  >
-    <ion-icon name="add-outline" slot="start"></ion-icon>
-    Crear Tienda
-  </ion-button>
-  <ion-button (click)="onLogOut()" expand="block" class="logout">
-    <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar Sesión
-  </ion-button>
+  <ion-grid [fixed]="true">
+    <ion-row>
+      <ion-col>
+        <ion-button (click)="onLogOut()" expand="block" class="logout">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar
+          Sesión
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button
+          [class]="setDinamicClass"
+          (click)="onCreateStore()"
+          expand="block"
+        >
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Crear Tienda
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <ion-modal [isOpen]="isModalUserOpen">
     <ng-template>

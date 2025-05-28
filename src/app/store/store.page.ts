@@ -107,4 +107,9 @@ export class StorePage implements OnInit {
       this.showAlert('❌ Error eliminar tienda');
     }
   }
+
+  isModalSettingsOpen = false;
+  setModalSettingsOpen(isOpenSetting: boolean) {
+    this.isModalSettingsOpen = isOpenSetting;
+  }
 }
