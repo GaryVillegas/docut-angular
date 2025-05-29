@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { getUserStoreData } from '../types/store';
+import { StoreService } from '../store.service';
 
 @Component({
   selector: 'app-home',
@@ -7,7 +9,13 @@ import { Component, OnInit } from '@angular/core';
   standalone: false,
 })
 export class HomePage implements OnInit {
-  constructor() {}
+  stores: getUserStoreData[] = [];
+  constructor(private storeServ: StoreService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.storeServ.getAllStores().subscribe((stores) => {
+      this.stores = stores;
+      console.log('Todas las Tiendas', stores);
+    });
+  }
 }

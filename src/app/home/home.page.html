@@ -1,7 +1,22 @@
-<ion-content [fullscreen]="true" color="light">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">home</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-header collapse="condense">
+  <ion-toolbar>
+    <ion-title size="large">home</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" color="light" class="ion-padding">
+  <div *ngFor="let store of stores">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title> {{store.storeInfo.bussinessName}} </ion-card-title>
+        <ion-card-subtitle> {{store.storeInfo.direction}} </ion-card-subtitle>
+      </ion-card-header>
+      <ion-grid [fixed]="true">
+        <ion-row>
+          <ion-col *ngFor="let category of store.storeInfo.categories">
+            <ion-chip [outline]="true">{{ category }}</ion-chip>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card>
+  </div>
 </ion-content>
