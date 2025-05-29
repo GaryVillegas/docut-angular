@@ -33,10 +33,16 @@ ion-input {
   margin-bottom: 15px;
 }
 
-.register-button {
-  --background: #673ab7; /* Purple color */
-  color: #fff;
+ion-button {
+  --background: #673ab7;
+  --color: white;
+  --background-activated: #5e4092;
   margin-bottom: 20px;
+}
+
+ion-icon {
+  color: #db4437; /* Google red color */
+  margin-right: 8px; /* Add spacing between icon and text */
 }
 
 .register-separator {

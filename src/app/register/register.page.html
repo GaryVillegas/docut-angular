@@ -7,30 +7,20 @@
 
     <ion-input label="Correo" type="email" [(ngModel)]="email"></ion-input>
 
-    <ion-input
-      label="Contraseña"
-      type="password"
-      [(ngModel)]="password"
+    <ion-input label="Contraseña" type="password" [(ngModel)]="password"
+      ><ion-input-password-toggle
+        color="tertiary"
+        slot="end"
+      ></ion-input-password-toggle
     ></ion-input>
 
-    <ion-button
-      expand="block"
-      color="primary"
-      class="register-button"
-      (click)="handleRegister()"
-      >Registrar</ion-button
-    >
+    <ion-button expand="block" (click)="handleRegister()">Registrar</ion-button>
 
     <div class="register-separator">
       <span>O Regístrate con</span>
     </div>
 
-    <ion-button
-      expand="block"
-      color="light"
-      class="register-google-button"
-      (click)="googleRegister()"
-    >
+    <ion-button expand="block" (click)="googleRegister()" color="light">
       <ion-icon name="logo-google" slot="start"></ion-icon>
       Google
     </ion-button>

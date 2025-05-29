@@ -3,20 +3,39 @@
     <ion-title size="large">home</ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content [fullscreen]="true" color="light" class="ion-padding">
-  <div *ngFor="let store of stores">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title> {{store.storeInfo.bussinessName}} </ion-card-title>
-        <ion-card-subtitle> {{store.storeInfo.direction}} </ion-card-subtitle>
-      </ion-card-header>
-      <ion-grid [fixed]="true">
-        <ion-row>
-          <ion-col *ngFor="let category of store.storeInfo.categories">
-            <ion-chip [outline]="true">{{ category }}</ion-chip>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card>
-  </div>
+<ion-content [fullscreen]="true" color="light">
+  <ion-searchbar animated="true" placeholder="Buscar tienda"></ion-searchbar>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h2 class="title">Tus citas</h2>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h2 class="title">Disponible</h2>
+        <ion-card *ngFor="let store of stores">
+          <ion-card-header>
+            <ion-card-title> {{store.storeInfo.bussinessName}} </ion-card-title>
+            <ion-card-subtitle
+              ><ion-icon name="navigate-circle-outline"></ion-icon>
+              {{store.storeInfo.direction}}
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-grid [fixed]="true">
+            <ion-row>
+              <ion-col
+                *ngFor="let category of store.storeInfo.categories"
+                size="auto"
+              >
+                <ion-chip [outline]="true">{{ category }}</ion-chip>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

@@ -103,7 +103,7 @@
     <div class="categories-grid">
       <ion-chip
         *ngFor="let category of categories"
-        [color]="isCategorySelected(category) ? 'primary' : 'medium'"
+        [color]="isCategorySelected(category) ? 'tertiary' : 'medium'"
         (click)="toggleCategory(category)"
       >
         {{category}}
@@ -125,6 +125,8 @@
   <!-- Slide 5: Final -->
   <div *ngIf="currentSlideIndex === 4" class="slide final-slide">
     <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
-    <ion-button expand="block" (click)="handleSubmit()">Finalizar</ion-button>
+    <ion-button color="tertiary" expand="block" (click)="handleSubmit()"
+      >Finalizar</ion-button
+    >
   </div>
 </ion-content>

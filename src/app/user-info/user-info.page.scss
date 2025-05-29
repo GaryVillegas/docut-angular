@@ -32,7 +32,7 @@ ion-content {
   font-weight: 600;
   text-align: center;
   margin: 24px 0;
-  color: var(--ion-color-primary);
+  color: var(--ion-color-tertiary);
   contain: content;
 }
 
@@ -41,7 +41,7 @@ ion-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   contain: content;
 }
 
@@ -52,7 +52,7 @@ ion-content {
   justify-content: center;
   height: 160px;
   background: white;
-  border: 1px solid var(--input-border);
+  border: 1px solid var(--ion-color-tertiary);
   border-radius: 12px;
   padding: 16px;
   transition: all 0.2s ease;
@@ -63,7 +63,7 @@ ion-content {
   }
 
   &.selected {
-    border: 2px solid var(--ion-color-primary);
+    border: 2px solid var(--ion-color-tertiary);
     background: var(--card-selected-bg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
@@ -72,7 +72,7 @@ ion-content {
 .option-icon {
   font-size: 48px;
   margin-bottom: 12px;
-  color: var(--ion-color-primary);
+  color: var(--ion-color-tertiary);
   contain: content;
 }
 
@@ -92,7 +92,7 @@ ion-content {
 
   &.ion-focused {
     background: white;
-    box-shadow: 0 0 0 2px var(--ion-color-primary);
+    box-shadow: 0 0 0 2px var(--ion-color-tertiary);
   }
 }
 
@@ -125,14 +125,10 @@ ion-content {
   contain: content;
 
   ion-button {
-    margin: 0;
-    height: 48px;
-    font-weight: 500;
-    contain: content;
-
-    &[fill="clear"] {
-      --background-hover: rgba(var(--ion-color-medium-rgb), 0.08);
-    }
+    --background: #673ab7;
+    --color: white;
+    --background-activated: #5e4092;
+    margin-bottom: 20px;
   }
 }
 
@@ -148,7 +144,7 @@ ion-content {
 
 .success-icon {
   font-size: 120px;
-  color: var(--ion-color-primary);
+  color: var(--ion-color-tertiary);
   margin-bottom: 32px;
   contain: content;
 }

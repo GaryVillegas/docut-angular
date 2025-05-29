@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" color="light">
-  <ion-list [inset]="true" lines="none">
+  <ion-list [inset]="true" lines="none" class="list-user">
     <ion-list-header>
       <ion-label>Tus Datos</ion-label>
     </ion-list-header>
@@ -52,14 +52,6 @@
   <ion-grid [fixed]="true">
     <ion-row>
       <ion-col>
-        <ion-button (click)="onLogOut()" expand="block" class="logout">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar
-          Sesión
-        </ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
         <ion-button
           [class]="setDinamicClass"
           (click)="onCreateStore()"
@@ -67,6 +59,14 @@
         >
           <ion-icon name="add-outline" slot="start"></ion-icon>
           Crear Tienda
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button (click)="onLogOut()" expand="block" class="logout">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar
+          Sesión
         </ion-button>
       </ion-col>
     </ion-row>
