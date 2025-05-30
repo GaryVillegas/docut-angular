@@ -5,11 +5,22 @@
 </ion-header>
 <ion-content [fullscreen]="true" color="light">
   <ion-searchbar animated="true" placeholder="Buscar tienda"></ion-searchbar>
+  @if (isLoading){
+  <div class="ion-text-center ion-padding">
+    <ion-spinner color="tertiary"></ion-spinner>
+    <p>Cargando servicios...</p>
+  </div>
+  }@else{
   <ion-grid>
     <ion-row>
       <ion-col>
         <h2 class="title">Tus citas</h2>
       </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-card color="tertiary" class="appointment-card">
+        <p>Sin citas pronosticadas. 😉</p>
+      </ion-card>
     </ion-row>
   </ion-grid>
   <ion-grid>
@@ -38,4 +49,5 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  }
 </ion-content>

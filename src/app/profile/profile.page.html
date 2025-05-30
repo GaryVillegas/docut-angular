@@ -5,7 +5,13 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" color="light">
-  <ion-list [inset]="true" lines="none" class="list-user">
+  @if(isLoading){
+  <div class="ion-text-center ion-padding">
+    <ion-spinner color="tertiary"></ion-spinner>
+    <p>Cargando servicios...</p>
+  </div>
+  }@else{
+  <ion-list [inset]="true" lines="none">
     <ion-list-header>
       <ion-label>Tus Datos</ion-label>
     </ion-list-header>
@@ -71,6 +77,7 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  }
 
   <ion-modal [isOpen]="isModalUserOpen">
     <ng-template>

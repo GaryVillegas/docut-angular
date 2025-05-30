@@ -7,6 +7,7 @@ import { switchMap, finalize, catchError } from 'rxjs/operators';
 import type { UserStoreData } from '../types/store';
 import type { UserData } from '../types/user';
 import { ToastController } from '@ionic/angular';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-profile',
@@ -45,7 +46,8 @@ export class ProfilePage implements OnInit {
     private authService: AuthService,
     private route: Router,
     private storeServ: StoreService,
-    private toast: ToastController
+    private toast: ToastController,
+    private auth: AngularFireAuth
   ) {}
 
   ngOnInit() {
@@ -61,68 +63,71 @@ export class ProfilePage implements OnInit {
    * 🚀 Función optimizada para cargar el perfil del usuario
    * Usa forkJoin para hacer llamadas paralelas cuando es posible
    */
-  loadUserProfile() {
+  async loadUserProfile() {
     this.isLoading = true;
     this.loadingError = null;
 
-    this.authService
-      .getCurrentUser()
-      .pipe(
-        switchMap((user) => {
-          if (!user?.uid) {
-            throw new Error('Usuario no autenticado');
-          }
+    try {
+      const user = await this.auth.currentUser;
+      if (!user) {
+        this.showAlert('No hay un usuario autenticado.');
+        this.isLoading = false;
+        return;
+      }
 
-          // 📊 Cargar datos del usuario primero
-          return this.storeServ.getUserData(user.uid).pipe(
-            switchMap((userData) => {
-              this.userData = userData;
-              this.isClient = userData.userInfoData.tipe === 'cliente';
+      console.log('✅ Usuario encontrado:', user.uid);
 
-              console.log('✅ Datos de usuario cargados:', userData);
+      // 📊 Cargar datos del usuario
+      this.storeServ
+        .getUserData(user.uid)
+        .pipe(
+          switchMap((userData) => {
+            this.userData = userData;
+            this.isClient = userData.userInfoData.tipe === 'cliente';
 
-              // 🏪 Si es cliente, cargar datos de tienda en paralelo
-              if (this.isClient) {
-                return this.storeServ.getStoreData(user.uid).pipe(
-                  catchError((error) => {
-                    console.warn('⚠️ Error cargando tienda:', error);
-                    return of(this.userStoreData); // Devolver datos vacíos si hay error
-                  })
-                );
-              } else {
-                // Si no es cliente, no necesita datos de tienda
-                this.setDinamicClass = 'ion-hide';
-                return of(null);
-              }
-            })
-          );
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        }),
-        catchError((error) => {
-          console.error('❌ Error cargando perfil:', error);
-          this.loadingError = 'Error al cargar los datos del perfil';
-          this.isLoading = false;
-          return of(null);
-        })
-      )
-      .subscribe({
-        next: (storeData) => {
-          if (storeData && this.isClient) {
-            this.userStoreData = storeData;
-            console.log('✅ Datos de tienda cargados:', storeData);
+            console.log('✅ Datos de usuario cargados:', userData);
 
-            // 🎯 Lógica para mostrar/ocultar botón de crear tienda
-            this.setDinamicClass = storeData.storeInfo.bussinessName
-              ? 'ion-hide'
-              : '';
-          }
-        },
-        error: (error) => {
-          console.error('❌ Error final:', error);
-        },
-      });
+            // 🏪 Si es cliente, cargar datos de tienda
+            if (this.isClient) {
+              return this.storeServ.getStoreData(user.uid).pipe(
+                catchError((error) => {
+                  console.warn('⚠️ Error cargando tienda:', error);
+                  return of(this.userStoreData);
+                })
+              );
+            } else {
+              this.setDinamicClass = 'ion-hide';
+              return of(null);
+            }
+          }),
+          finalize(() => {
+            this.isLoading = false;
+          }),
+          catchError((error) => {
+            console.error('❌ Error cargando perfil:', error);
+            this.loadingError = 'Error al cargar los datos del perfil';
+            return of(null);
+          })
+        )
+        .subscribe({
+          next: (storeData) => {
+            if (storeData && this.isClient) {
+              this.userStoreData = storeData;
+              console.log('✅ Datos de tienda cargados:', storeData);
+              this.setDinamicClass = storeData.storeInfo.bussinessName
+                ? 'ion-hide'
+                : '';
+            }
+          },
+          error: (error) => {
+            console.error('❌ Error final:', error);
+          },
+        });
+    } catch (error) {
+      console.error('❌ Error esperando auth state:', error);
+      this.showAlert('Error de autenticación.');
+      this.isLoading = false;
+    }
   }
 
   /**
@@ -151,10 +156,12 @@ export class ProfilePage implements OnInit {
         this.userData.userInfoData
       );
       this.showToast('Exito', '✅ Usuario editado con exito.');
+      this.isLoading = false;
       this.setModalUserOpen(false);
     } catch (error) {
       this.showAlert('❌ Error al editar usuario.');
       console.log('error al editar usuario: ', error);
+      this.isLoading = false;
     }
   }
 

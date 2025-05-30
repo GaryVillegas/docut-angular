@@ -4,7 +4,12 @@
       <ion-title size="large">Tu tienda</ion-title>
     </ion-toolbar>
   </ion-header>
-
+  @if(isLoading){
+  <div class="ion-text-center ion-padding">
+    <ion-spinner color="tertiary"></ion-spinner>
+    <p>Cargando servicios...</p>
+  </div>
+  }@else {
   <ion-list [inset]="true">
     <ion-list-header>
       <ion-label>{{userStoreData.storeInfo.bussinessName}}</ion-label>
@@ -60,6 +65,7 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  }
 
   <ion-modal [isOpen]="isModalSettingsOpen">
     <ng-template>

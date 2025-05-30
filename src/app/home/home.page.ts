@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { getUserStoreData } from '../types/store';
 import { StoreService } from '../store.service';
-import { AuthService } from '../auth.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -12,15 +11,17 @@ import { ToastController } from '@ionic/angular';
 })
 export class HomePage implements OnInit {
   stores: getUserStoreData[] = [];
+  isLoading = true;
+
   constructor(
     private storeServ: StoreService,
-    private toastController: ToastController,
-    private authServ: AuthService
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
     this.storeServ.getAllStores().subscribe((stores) => {
       this.stores = stores;
+      this.isLoading = false;
       console.log('Todas las Tiendas', stores);
     });
   }
