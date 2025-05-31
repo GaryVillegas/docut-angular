@@ -119,7 +119,7 @@ export class StoreService {
   /**
    * 📋 Busca servicios de una tienda específica
    */
-  private getServicesByStoreId(storeId: string): Observable<getServiceData[]> {
+  getServicesByStoreId(storeId: string): Observable<getServiceData[]> {
     const q = query(
       collection(this.firestore, 'service'),
       where('storeId', '==', storeId)

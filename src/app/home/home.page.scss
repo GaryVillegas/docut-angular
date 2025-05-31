@@ -19,6 +19,17 @@
 }
 
 .appointment-card p {
-  margin: 0; // Eliminar márgenes del párrafo
+  margin: 0;
   line-height: 1.4;
+}
+
+.appointment-card-modal {
+  background-color: #673ab7; // Color púrpura similar al de tu mockup
+  color: white;
+  ion-card-title {
+    --color: white;
+  }
+  ion-card-subtitle {
+    --color: #f3f3f3;
+  }
 }

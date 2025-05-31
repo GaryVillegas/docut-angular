@@ -264,7 +264,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
 
   editCurrentService() {
     if (this.currentService) {
-      console.log('Editar servicio:', this.currentService);
+      console.log('Editar servicio:', this.currentService); //debuging
       this.editService = {
         nombreServicio: this.currentService.serviceData.nombreServicio || '',
         descripcionServicio:
