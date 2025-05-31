@@ -53,7 +53,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
     btn1: 'Aqui especificas el nombre del servicio.',
     btn2: 'Aqui especificas lo que se hacer en el servicio',
     btn3: 'Aqui se coloca el valor del servico. (sin puntos o comas)',
-    btn4: 'Aqui solo pon el numero de horas que toma el servicio.',
+    btn4: 'Aqui solo pon el numero entero de horas que toma el servicio.',
   };
 
   constructor(
@@ -264,7 +264,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
 
   editCurrentService() {
     if (this.currentService) {
-      console.log('Editar servicio:', this.currentService);
+      console.log('Editar servicio:', this.currentService); //debuging
       this.editService = {
         nombreServicio: this.currentService.serviceData.nombreServicio || '',
         descripcionServicio:

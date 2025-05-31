@@ -21,6 +21,7 @@ export class StorePage implements OnInit {
       categories: [],
     },
   };
+  isLoading = true;
 
   constructor(
     private storeServ: StoreService,
@@ -42,6 +43,7 @@ export class StorePage implements OnInit {
     }
     await this.storeServ.getStoreByUID(user.uid).subscribe((storeData) => {
       this.userStoreData = storeData;
+      this.isLoading = false;
       console.log(storeData);
     });
   }
@@ -102,6 +104,7 @@ export class StorePage implements OnInit {
         'cliente'
       );
       this.setAlertDeleteOpen(false);
+      this.isLoading = false;
       this.showToast('Exito', '✅ Tienda Eliminada');
     } catch (error) {
       console.error('❌ Error eliminar tienda:', error);
@@ -146,6 +149,7 @@ export class StorePage implements OnInit {
         this.userStoreData.storeInfo
       );
       this.showToast('Exito', '✅ Tienda actualizada');
+      this.isLoading = false;
       this.setModalSettingsOpen(false);
     } catch (erro) {
       console.error('❌ Error eliminar tienda:', erro);

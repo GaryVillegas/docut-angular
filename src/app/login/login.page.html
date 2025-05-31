@@ -7,10 +7,11 @@
 
     <ion-input label="Correo" type="email" [(ngModel)]="email"></ion-input>
 
-    <ion-input
-      label="Contraseña"
-      type="password"
-      [(ngModel)]="password"
+    <ion-input label="Contraseña" type="password" [(ngModel)]="password"
+      ><ion-input-password-toggle
+        color="tertiary"
+        slot="end"
+      ></ion-input-password-toggle
     ></ion-input>
 
     <ion-button expand="block" (click)="handleLogin()">Ingresar</ion-button>

@@ -26,7 +26,8 @@ export class RegisterPage implements OnInit {
     if (!this.email || !this.password) {
       this.presentToast(
         'Falta credenciales',
-        'Por favor, complete todos los campos.'
+        'Por favor, complete todos los campos.',
+        'danger'
       );
       return;
     }
@@ -44,15 +45,24 @@ export class RegisterPage implements OnInit {
       ) {
         this.presentToast(
           'Error de inicio de sesión',
-          'Correo o contraseña incorrectos.'
+          'Correo o contraseña incorrectos.',
+          'danger'
         );
       } else if (error.code === 'auth/user-not-found') {
         this.presentToast(
           'Usuario no encontrado',
-          'No existe una cuenta con este correo.'
+          'No existe una cuenta con este correo.',
+          'danger'
         );
+      } else if (error.code === 'auth/email-already-in-use') {
+        this.presentToast('Error', 'Este correo ya esta registrado.', 'danger');
+        this.route.navigate(['/login']);
       } else {
-        this.presentToast('Error', 'Ocurrió un problema al iniciar sesión.');
+        this.presentToast(
+          'Error',
+          'Ocurrió un problema al iniciar sesión.',
+          'danger'
+        );
       }
     } finally {
       this.loading = false;
@@ -70,21 +80,30 @@ export class RegisterPage implements OnInit {
     } catch (error: any) {
       console.log(error);
       if (error.code === 'auth/popup-closed-by-user') {
-        this.presentToast('Error', 'Ha cerrado la ventana de google.');
+        this.presentToast(
+          'Error',
+          'Ha cerrado la ventana de google.',
+          'danger'
+        );
       } else {
-        this.presentToast('Error', 'El inicio de sesión con Google fallo.');
+        this.presentToast(
+          'Error',
+          'El inicio de sesión con Google fallo.',
+          'danger'
+        );
       }
     } finally {
       this.loading = false;
     }
   }
 
-  async presentToast(header: string, message: string) {
+  async presentToast(header: string, message: string, color: string) {
     const toast = await this.toastController.create({
       header: header,
       message: message,
       duration: 2000,
       position: 'top',
+      color: color,
     });
     toast.present();
   }

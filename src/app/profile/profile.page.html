@@ -5,6 +5,12 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" color="light">
+  @if(isLoading){
+  <div class="ion-text-center ion-padding">
+    <ion-spinner color="tertiary"></ion-spinner>
+    <p>Cargando servicios...</p>
+  </div>
+  }@else{
   <ion-list [inset]="true" lines="none">
     <ion-list-header>
       <ion-label>Tus Datos</ion-label>
@@ -52,14 +58,6 @@
   <ion-grid [fixed]="true">
     <ion-row>
       <ion-col>
-        <ion-button (click)="onLogOut()" expand="block" class="logout">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar
-          Sesión
-        </ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
         <ion-button
           [class]="setDinamicClass"
           (click)="onCreateStore()"
@@ -70,7 +68,16 @@
         </ion-button>
       </ion-col>
     </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button (click)="onLogOut()" expand="block" class="logout">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon> Cerrar
+          Sesión
+        </ion-button>
+      </ion-col>
+    </ion-row>
   </ion-grid>
+  }
 
   <ion-modal [isOpen]="isModalUserOpen">
     <ng-template>

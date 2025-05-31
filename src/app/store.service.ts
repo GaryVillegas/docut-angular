@@ -11,8 +11,10 @@ import {
   limit,
   updateDoc,
   deleteDoc,
+  QuerySnapshot,
+  onSnapshot,
 } from '@angular/fire/firestore';
-import { from, type Observable, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import type {
   getUserStoreData,
@@ -117,7 +119,7 @@ export class StoreService {
   /**
    * 📋 Busca servicios de una tienda específica
    */
-  private getServicesByStoreId(storeId: string): Observable<getServiceData[]> {
+  getServicesByStoreId(storeId: string): Observable<getServiceData[]> {
     const q = query(
       collection(this.firestore, 'service'),
       where('storeId', '==', storeId)
@@ -200,6 +202,28 @@ export class StoreService {
         );
       })
     );
+  }
+
+  getAllStores(): Observable<getUserStoreData[]> {
+    return new Observable((observer) => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, 'stores'),
+        (snapshot) => {
+          const stores = snapshot.docs.map(
+            (doc) =>
+              ({
+                documentId: doc.id,
+                userUID: doc.data()['userUID'],
+                storeInfo: doc.data()['storeInfo'],
+              } as getUserStoreData)
+          );
+          observer.next(stores);
+        },
+        (error) => observer.error(error)
+      );
+
+      return () => unsubscribe();
+    });
   }
 
   async createUserInfo(UID: string, userInfo: any): Promise<void> {

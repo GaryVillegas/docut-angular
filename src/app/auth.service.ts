@@ -6,12 +6,17 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from '@angular/fire/auth';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private authServ: AngularFireAuth, private auth: Auth) {}
+  constructor(
+    private authServ: AngularFireAuth,
+    private auth: Auth,
+    private router: Router
+  ) {}
 
   async authentication(email: string, password: string) {
     try {
@@ -28,6 +33,7 @@ export class AuthService {
       await this.authServ.createUserWithEmailAndPassword(email, password);
     } catch (error) {
       console.error('error al crear cuenta: ', error);
+      throw error;
     }
   }
 
