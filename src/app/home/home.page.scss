@@ -33,3 +33,15 @@
     --color: #f3f3f3;
   }
 }
+
+.descripcion-corta {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  line-height: 1.4em;
+  max-height: 2.8em;
+}

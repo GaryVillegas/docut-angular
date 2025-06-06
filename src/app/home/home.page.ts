@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { getUserStoreData, ServiceData } from '../types/store';
+import { getUserStoreData, getServiceData } from '../types/store';
 import { StoreService } from '../store.service';
 import { ToastController } from '@ionic/angular';
 
@@ -11,6 +11,8 @@ import { ToastController } from '@ionic/angular';
 })
 export class HomePage implements OnInit {
   stores: getUserStoreData[] = [];
+  serviceStore: getServiceData[] = [];
+
   isLoading = true;
 
   constructor(
@@ -33,6 +35,13 @@ export class HomePage implements OnInit {
   setModalStore(isOpen: boolean, storeSelectedId: string | null) {
     this.isModalStore = isOpen;
     this.storeSelected = storeSelectedId;
+    if (isOpen && storeSelectedId) {
+      this.loadStoreService(storeSelectedId);
+      this.isLoading = false;
+    } else {
+      //limpiar servicios cuando se cierra el modal
+      this.serviceStore = [];
+    }
     console.log('Tienda seleccionada:', storeSelectedId);
     console.log('Modal abierto:', isOpen);
   }
@@ -41,6 +50,14 @@ export class HomePage implements OnInit {
   getSelectedStore(): getUserStoreData | undefined {
     if (!this.storeSelected) return undefined;
     return this.stores.find((store) => store.documentId === this.storeSelected);
+  }
+
+  //Metodo para obtener los servicios de la tienda
+  private loadStoreService(storeId: string) {
+    this.storeServ.getServicesByStoreId(storeId).subscribe((services) => {
+      this.serviceStore = services;
+      console.log('servicios cargados: ', this.serviceStore);
+    });
   }
 
   async presentToast(header: string, message: string, color: string) {

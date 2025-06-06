@@ -19,3 +19,12 @@ ion-textarea {
   border-radius: 8px;
   margin-bottom: 15px;
 }
+
+.descripcion-corta {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

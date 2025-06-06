@@ -11,7 +11,6 @@ import {
   limit,
   updateDoc,
   deleteDoc,
-  QuerySnapshot,
   onSnapshot,
 } from '@angular/fire/firestore';
 import { from, Observable, of } from 'rxjs';

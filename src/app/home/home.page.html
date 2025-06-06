@@ -91,7 +91,25 @@
           </ion-card>
         </div>
 
-        <!-- Modifica el modal de servicios para asegurarte de que se muestra correctamente -->
+        <ion-card *ngFor="let services of serviceStore">
+          <ion-card-header>
+            <ion-card-subtitle>
+              Tiempo Estimado: {{services.serviceData.tiempoEstimado}}, Costo:
+              ${{services.serviceData.precio}}
+            </ion-card-subtitle>
+            <ion-card-title>
+              {{services.serviceData.nombreServicio}}
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content class="descripcion-corta">
+            {{services.serviceData.descripcionServicio}}
+          </ion-card-content>
+        </ion-card>
+        <ion-card *ngIf="serviceStore.length === 0">
+          <ion-card-header>
+            <ion-card-title> Sin Servicios </ion-card-title>
+          </ion-card-header>
+        </ion-card>
       </ion-content>
     </ng-template>
   </ion-modal>
