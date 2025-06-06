@@ -53,7 +53,7 @@ export class UserInfoPage {
     'Depilación',
   ];
 
-  slides = [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }, { id: '5' }];
+  slides = [{ id: '0' }, { id: '1' }];
 
   constructor(
     private router: Router,
@@ -83,11 +83,7 @@ export class UserInfoPage {
   }
 
   nextSlide() {
-    if (this.userInfo.tipe === 'cliente' && this.currentSlideIndex === 1) {
-      this.currentSlideIndex = 4;
-    } else {
-      this.currentSlideIndex++;
-    }
+    this.currentSlideIndex++;
   }
 
   prevSlide() {
@@ -118,6 +114,24 @@ export class UserInfoPage {
     } catch (err) {
       this.showAlert('Hubo un error al guardar la información del usuario.');
     }
+  }
+
+  formatRUT(event: any) {
+    let value = event.target.value.replace(/[\.\-]/g, '');
+
+    if (value.length > 1) {
+      value = value.slice(0, -1) + '-' + value.slice(-1);
+    }
+
+    if (value.length > 5) {
+      value = value.slice(0, 2) + '.' + value.slice(2);
+    }
+
+    if (value.length > 9) {
+      value = value.slice(0, 6) + '.' + value.slice(6);
+    }
+
+    this.userInfo.rut = value;
   }
 
   cancel() {
