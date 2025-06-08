@@ -141,6 +141,22 @@ export class StoreService {
   }
 
   /**
+   * 📋 Busca servicios segun su id
+   */
+  getServiceById(serviceId: string): Observable<getServiceData> {
+    const docRef = doc(this.firestore, 'service', serviceId);
+    return from(getDoc(docRef)).pipe(
+      map((serviceDoc) => ({
+        documentId: serviceId,
+        storeId: serviceDoc.exists() ? serviceDoc.data()?.['storeId'] : '',
+        serviceData: serviceDoc.exists()
+          ? serviceDoc.data()?.['serviceData']
+          : [],
+      }))
+    );
+  }
+
+  /**
    * ➕ Crear servicio - Versión simplificada
    */
   async createServiceForUser(

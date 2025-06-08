@@ -91,7 +91,10 @@
           </ion-card>
         </div>
 
-        <ion-card *ngFor="let services of serviceStore">
+        <ion-card
+          *ngFor="let services of serviceStore"
+          (click)="createDate(services.documentId)"
+        >
           <ion-card-header>
             <ion-card-subtitle>
               Tiempo Estimado: {{services.serviceData.tiempoEstimado}}, Costo:

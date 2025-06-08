@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { getUserStoreData, getServiceData } from '../types/store';
 import { StoreService } from '../store.service';
 import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,8 @@ export class HomePage implements OnInit {
 
   constructor(
     private storeServ: StoreService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private route: Router
   ) {}
 
   ngOnInit() {
@@ -58,6 +60,12 @@ export class HomePage implements OnInit {
       this.serviceStore = services;
       console.log('servicios cargados: ', this.serviceStore);
     });
+  }
+
+  //Mandar datos a cita
+  createDate(serviceId: string) {
+    this.setModalStore(false, null);
+    this.route.navigate(['/cita'], { queryParams: { id: serviceId } });
   }
 
   async presentToast(header: string, message: string, color: string) {
