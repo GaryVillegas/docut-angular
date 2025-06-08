@@ -10,8 +10,29 @@
   </ion-grid>
 
   <div class="ion-padding">
-    <ion-datetime presentation="date"></ion-datetime>
+    <!-- Tenemos que ver la forma de seleccionarla-->
+    <ion-datetime
+      color="rose"
+      presentation="date"
+      [min]="minDate"
+      (ionChange)="onDateChange($event)"
+    ></ion-datetime>
   </div>
 
-  <div></div>
+  <div>
+    <!-- Tenemos que ver la forma de seleccionarla-->
+    <ion-picker>
+      <ion-picker-column value="">
+        <ion-picker-column-option value="">--</ion-picker-column-option>
+        <ion-picker-column-option value="javascript"
+          >Javascript</ion-picker-column-option
+        >
+        <ion-picker-column-option value="typescript" disabled="true"
+          >Typescript</ion-picker-column-option
+        >
+        <ion-picker-column-option value="rust">Rust</ion-picker-column-option>
+        <ion-picker-column-option value="c#">C#</ion-picker-column-option>
+      </ion-picker-column>
+    </ion-picker>
+  </div>
 </ion-content>

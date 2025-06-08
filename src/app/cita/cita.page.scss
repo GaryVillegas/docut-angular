@@ -12,3 +12,21 @@ ion-grid {
     }
   }
 }
+
+ion-datetime {
+  --background: #673ab7;
+  border-radius: 16px;
+}
+
+ion-datetime::part(calendar-day) {
+  background: whitesmoke;
+  color: black;
+}
+ion-datetime::part(calendar-day today) {
+  color: #673ab7;
+  font-weight: bold;
+}
+ion-datetime::part(calendar-day active) {
+  background-color: #673ab7;
+  color: white;
+}
