@@ -9,30 +9,42 @@
     </ion-row>
   </ion-grid>
 
-  <div class="ion-padding">
-    <!-- Tenemos que ver la forma de seleccionarla-->
+  <div *ngIf="currentSlide === 0" class="slide ion-padding">
+    <!--here we select the current date to de actual "date"-->
     <ion-datetime
       color="rose"
       presentation="date"
       [min]="minDate"
+      datetime="YYYY-MM-DD"
       (ionChange)="onDateChange($event)"
     ></ion-datetime>
   </div>
 
-  <div>
+  <div *ngIf="currentSlide === 1" class="slide ion-padding">
     <!-- Tenemos que ver la forma de seleccionarla-->
-    <ion-picker>
-      <ion-picker-column value="">
-        <ion-picker-column-option value="">--</ion-picker-column-option>
-        <ion-picker-column-option value="javascript"
-          >Javascript</ion-picker-column-option
-        >
-        <ion-picker-column-option value="typescript" disabled="true"
-          >Typescript</ion-picker-column-option
-        >
-        <ion-picker-column-option value="rust">Rust</ion-picker-column-option>
-        <ion-picker-column-option value="c#">C#</ion-picker-column-option>
-      </ion-picker-column>
-    </ion-picker>
+    <ion-datetime
+      class="ion-margin-top"
+      presentation="time"
+      (ionChange)="onTimeChange($event)"
+    ></ion-datetime>
+    <ion-button (click)="selectTimeNextSlide()"> Siguiente </ion-button>
+  </div>
+
+  <div *ngIf="currentSlide === 2" class="slide ion-padding">
+    <h3>¿Para quien es la cita?</h3>
+    <ion-input
+      [(ngModel)]="cita.nombreUsuario"
+      placeholder="Nombre"
+    ></ion-input>
+    <ion-input
+      [(ngModel)]="cita.apellidoUsuario"
+      placeholder="Apellido"
+    ></ion-input>
+    <ion-button (click)="createDate()"> Crear Cita </ion-button>
+  </div>
+
+  <div *ngIf="currentSlide === 3">
+    <h4>Cita Agendada 😎</h4>
+    <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
   </div>
 </ion-content>

@@ -24,6 +24,7 @@ import type {
   StoreInfo,
 } from './types/store';
 import type { UserData, UserInfoData } from './types/user';
+import { cita } from './types/date';
 
 @Injectable({
   providedIn: 'root',
@@ -291,6 +292,22 @@ export class StoreService {
       console.log('Servico creado.');
     } catch (error) {
       console.error('Error al crear el servicio: ', error);
+      throw error;
+    }
+  }
+
+  async createCita(citaData: cita) {
+    try {
+      if (!citaData) {
+        throw new Error('Los datos son requeridos.');
+      }
+      const id = `${citaData.idUsuario}-${Date.now()}`;
+      await setDoc(doc(this.firestore, 'cita', id), {
+        cita: citaData,
+      });
+      console.log('cita creada');
+    } catch (error) {
+      console.error('Error al crear la cita: ', error);
       throw error;
     }
   }
