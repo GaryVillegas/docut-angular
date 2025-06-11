@@ -6,6 +6,11 @@ import { ToastController } from '@ionic/angular';
 import { tap } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { cita } from '../types/date';
+import {
+  TransactionRequest,
+  CreateTransactionResponse,
+} from './../types/transbank';
+import { TransbankService } from '../transbank.service';
 
 @Component({
   selector: 'app-cita',
@@ -25,13 +30,20 @@ export class CitaPage implements OnInit {
     apellidoUsuario: '',
     idUsuario: '',
   };
+  newTransaction: TransactionRequest = {
+    amount: 0,
+    sessionId: '',
+    buyOrder: '',
+  };
+  currentToken = '';
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private storeServ: StoreService,
     private toastController: ToastController,
     private auth: AngularFireAuth,
-    private route: Router
+    private route: Router,
+    private transbankService: TransbankService
   ) {}
 
   ngOnInit() {
@@ -42,6 +54,7 @@ export class CitaPage implements OnInit {
       this.loadServiceData(this.serviceId);
     }
     this.minDate = new Date().toISOString();
+    this.generateIds();
   }
 
   //cargar los datos del servicio
@@ -51,6 +64,9 @@ export class CitaPage implements OnInit {
       .pipe(
         tap((data) => {
           this.serviceData = data;
+          this.newTransaction.amount = Number(
+            this.serviceData.serviceData.precio
+          );
           console.log('Service Data: ', data);
         })
         /**\
@@ -93,9 +109,7 @@ export class CitaPage implements OnInit {
   }
 
   /**
-   * TODO: create a date in firebase to save the date store
-   * handle data like id, fechaSeleccionada, horaSeleccionada, idNegocio, idServicio.
-   * @cita, this attribute get all de data
+   * TODO: With all the data, need to create a transbank check
    */
   async createDate() {
     const user = await this.auth.currentUser;
@@ -135,10 +149,9 @@ export class CitaPage implements OnInit {
     console.log('Datos de la cita listos para guardar:', this.cita);
     try {
       await this.storeServ.createCita(this.cita);
-      this.nextSlide();
       setTimeout(() => {
         this.route.navigate(['/tabs/home']);
-      }, 5000);
+      }, 3000);
     } catch (error) {
       this.presentToast(
         'Error',
@@ -146,6 +159,80 @@ export class CitaPage implements OnInit {
         'danger'
       );
     }
+  }
+
+  //generando ids de la compra
+  async generateIds() {
+    const user = await this.auth.currentUser;
+    if (!user) {
+      this.presentToast('Error', 'No hay un usuario autenticado.', 'danger');
+      return;
+    }
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    this.newTransaction.sessionId = `session_${user.uid}`;
+    this.newTransaction.buyOrder = `order_${timestamp}/${random}`;
+  }
+
+  async createTransaction() {
+    const loading = await this.transbankService.showLoading(
+      'Creando transacción...'
+    );
+    this.transbankService.createTransaction(this.newTransaction).subscribe({
+      next: (response: CreateTransactionResponse) => {
+        console.log('transaccion creada: ', response);
+        loading.dismiss();
+
+        if (response.success) {
+          this.currentToken = response.token;
+          this.transbankService.showToast(response.message);
+          this.transbankService.redirectToPayment(response.url);
+        } else {
+          this.transbankService.showToast(
+            'Error al crear la transaccion.',
+            'danger'
+          );
+        }
+      },
+      error: (error) => {
+        console.error('Error al crear transaccion: ', error);
+        loading.dismiss();
+        if (error.error && error.error.error) {
+          this.transbankService.showToast(error.error.error, 'danger');
+        } else {
+          this.transbankService.showToast('Error de conexión', 'danger');
+        }
+      },
+    });
+  }
+
+  isAlertOpen = false;
+  alertButtons = [
+    {
+      text: 'Presencial',
+      role: 'cancel',
+      handler: () => {
+        this.nextSlide();
+        setTimeout(() => {
+          this.createDate();
+        }, 2000);
+      },
+    },
+    {
+      text: 'Transferencia',
+      role: 'confirm',
+      handler: () => {
+        this.createTransaction();
+      },
+    },
+  ];
+
+  setOpenAlert(isOpen: boolean) {
+    this.isAlertOpen = isOpen;
+  }
+
+  cancelar() {
+    this.route.navigate(['/tabs/home']);
   }
 
   //toas

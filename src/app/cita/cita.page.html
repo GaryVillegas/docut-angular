@@ -2,7 +2,7 @@
   <ion-grid [fixed]="true">
     <ion-row>
       <ion-col size="auto">
-        <ion-back-button default-href="/tabs/store" text="">
+        <ion-back-button default-href="/tabs/home" text="">
           <ion-icon name="chevron-back-outline"></ion-icon>
         </ion-back-button>
       </ion-col>
@@ -40,7 +40,13 @@
       [(ngModel)]="cita.apellidoUsuario"
       placeholder="Apellido"
     ></ion-input>
-    <ion-button (click)="createDate()"> Crear Cita </ion-button>
+    <ion-button (click)="setOpenAlert(true)"> Crear Cita </ion-button>
+    <ion-alert
+      [isOpen]="isAlertOpen"
+      header="Seleccion Metodo de Pago"
+      message="Por favor seleccione el metodo de pago que mas le acomode."
+      [buttons]="alertButtons"
+    ></ion-alert>
   </div>
 
   <div *ngIf="currentSlide === 3">
