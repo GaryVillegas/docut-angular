@@ -51,9 +51,21 @@ export class TransbankService {
     );
   }
 
-  redirectToPayment(url: string) {
-    this.iab.create(url, '_system');
-  }
+  redirectToWebpay(token: string, url: string) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = url;
+  form.target = '_self'; // o '_blank' si quieres nueva pestaña
+
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'token_ws';
+  input.value = token;
+
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+}
 
   async showLoading(message = 'Procesando. . .') {
     const loading = await this.loadingController.create({

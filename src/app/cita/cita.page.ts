@@ -178,6 +178,7 @@ export class CitaPage implements OnInit {
     const loading = await this.transbankService.showLoading(
       'Creando transacción...'
     );
+    this.createDate();
     this.transbankService.createTransaction(this.newTransaction).subscribe({
       next: (response: CreateTransactionResponse) => {
         console.log('transaccion creada: ', response);
@@ -186,7 +187,7 @@ export class CitaPage implements OnInit {
         if (response.success) {
           this.currentToken = response.token;
           this.transbankService.showToast(response.message);
-          this.transbankService.redirectToPayment(response.url);
+          this.transbankService.redirectToWebpay(response.token, response.url);
         } else {
           this.transbankService.showToast(
             'Error al crear la transaccion.',
