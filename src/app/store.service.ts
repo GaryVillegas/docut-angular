@@ -24,7 +24,7 @@ import type {
   StoreInfo,
 } from './types/store';
 import type { UserData, UserInfoData } from './types/user';
-import { cita } from './types/date';
+import { cita, getCita } from './types/date';
 
 @Injectable({
   providedIn: 'root',
@@ -252,6 +252,27 @@ export class StoreService {
       userUID,
       storeInfo,
     });
+  }
+
+  //Obtener la cita del usuario
+  getCitaData(userUID: string): Observable<getCita | null> {
+    const citaPromise = (async () => {
+      const citaRef = collection(this.firestore, 'cita');
+      const q = query(citaRef, where('idUsuario', '==', userUID), limit(1));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        return {
+          id: doc.id,
+          ...doc.data(),
+        } as getCita;
+      } else {
+        return null;
+      }
+    })();
+
+    return from(citaPromise); // <- convierte la Promise a Observable
   }
 
   getUserData(uid: string): Observable<UserData> {
