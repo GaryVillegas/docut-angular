@@ -38,9 +38,15 @@ export class HomePage implements OnInit {
       if (citaDoc) {
         const fechaHoy = new Date().toISOString().split('T')[0];
         const fechaCita = citaDoc.citaData.fechaSeleccionada;
-        if (fechaCita === fechaHoy) {
-          this.cita = citaDoc;
-          console.log(this.cita);
+        console.log(citaDoc.citaData.idUsuario);
+        if (user.uid == citaDoc.citaData.idUsuario) {
+          if (fechaCita === fechaHoy) {
+            this.cita = citaDoc;
+            console.log(this.cita);
+          } else {
+            this.cita = null;
+            console.log('No se encontro cita');
+          }
         } else {
           this.cita = null;
           console.log('No se encontro cita');
