@@ -3,6 +3,8 @@ import { getUserStoreData, getServiceData } from '../types/store';
 import { StoreService } from '../store.service';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { getCita } from '../types/date';
 
 @Component({
   selector: 'app-home',
@@ -13,20 +15,39 @@ import { Router } from '@angular/router';
 export class HomePage implements OnInit {
   stores: getUserStoreData[] = [];
   serviceStore: getServiceData[] = [];
+  cita: getCita | null = null;
 
   isLoading = true;
 
   constructor(
     private storeServ: StoreService,
     private toastController: ToastController,
-    private route: Router
+    private route: Router,
+    private auth: AngularFireAuth
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    const user = await this.auth.currentUser;
+    if (!user) return;
     this.storeServ.getAllStores().subscribe((stores) => {
       this.stores = stores;
       this.isLoading = false;
       console.log('Todas las Tiendas', stores);
+    });
+    this.storeServ.getCitaData(user.uid).subscribe((citaDoc) => {
+      if (citaDoc) {
+        const fechaHoy = new Date().toISOString().split('T')[0];
+        const fechaCita = citaDoc.citaData.fechaSeleccionada;
+        if (fechaCita === fechaHoy) {
+          this.cita = citaDoc;
+          console.log(this.cita);
+        } else {
+          this.cita = null;
+          console.log('No se encontro cita');
+        }
+      } else {
+        this.cita = null;
+      }
     });
   }
 
