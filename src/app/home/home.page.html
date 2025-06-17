@@ -18,9 +18,23 @@
       </ion-col>
     </ion-row>
     <ion-row>
+      @if(cita){
+      <ion-card color="tertiary">
+        <ion-card-header>
+          <ion-card-title>
+            {{cita.citaData.nombreUsuario}} {{cita.citaData.apellidoUsuario}}
+          </ion-card-title>
+          <ion-card-subtitle> {{cita.citaData.idServicio}} </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Hora Cita: {{cita.citaData.horaSeleccionada}}</p>
+        </ion-card-content>
+      </ion-card>
+      } @else {
       <ion-card color="tertiary" class="appointment-card">
         <p>Sin citas pronosticadas. 😉</p>
       </ion-card>
+      }
     </ion-row>
   </ion-grid>
   <ion-grid>
