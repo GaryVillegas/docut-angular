@@ -258,10 +258,12 @@ export class StoreService {
   getCitaData(userUID: string): Observable<getCita | null> {
     const citaPromise = (async () => {
       const citaRef = collection(this.firestore, 'cita');
+      const fechaHoy = new Date().toISOString().split('T')[0];
       // Cambiamos 'idUsuario' por 'cita.idUsuario' ya que los datos están anidados
       const q = query(
         citaRef,
         where('cita.idUsuario', '==', userUID),
+        where('cita.fechaSeleccionada', '==', fechaHoy),
         limit(1)
       );
       const querySnapshot = await getDocs(q);
@@ -300,6 +302,22 @@ export class StoreService {
 
   async getStoreIdsByUserUID(userUID: string): Promise<string[]> {
     return this.getStoreIdsAsync(userUID);
+  }
+
+  async getServiceName(serviceId: string): Promise<string | null> {
+    try {
+      if (!serviceId) throw new Error('serviceId are required.');
+      const serviceRef = doc(this.firestore, 'service', serviceId);
+      const serviceSnapshot = await getDoc(serviceRef);
+      if (!serviceSnapshot.exists())
+        throw new Error('Este servicio no existe.');
+      const serviceName =
+        serviceSnapshot.data()?.['serviceData']?.['nombreServicio'];
+      return serviceName;
+    } catch (error) {
+      console.log('Error catching service name: ', error);
+      throw error;
+    }
   }
 
   async createServiceStore(storeID: string, serviceData: ServiceStoreData) {

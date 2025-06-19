@@ -16,6 +16,7 @@ export class HomePage implements OnInit {
   stores: getUserStoreData[] = [];
   serviceStore: getServiceData[] = [];
   cita: getCita | null = null;
+  serviceCitaName: string | null = null;
 
   isLoading = true;
 
@@ -34,19 +35,13 @@ export class HomePage implements OnInit {
       this.isLoading = false;
       console.log('Todas las Tiendas', stores);
     });
-    this.storeServ.getCitaData(user.uid).subscribe((citaDoc) => {
+    this.storeServ.getCitaData(user.uid).subscribe(async (citaDoc) => {
       if (citaDoc) {
-        const fechaHoy = new Date().toISOString().split('T')[0];
-        const fechaCita = citaDoc.citaData.fechaSeleccionada;
-        console.log(citaDoc.citaData.idUsuario);
         if (user.uid == citaDoc.citaData.idUsuario) {
-          if (fechaCita === fechaHoy) {
-            this.cita = citaDoc;
-            console.log(this.cita);
-          } else {
-            this.cita = null;
-            console.log('No se encontro cita');
-          }
+          this.cita = citaDoc;
+          this.serviceCitaName = await this.storeServ.getServiceName(
+            citaDoc.citaData.idServicio
+          );
         } else {
           this.cita = null;
           console.log('No se encontro cita');

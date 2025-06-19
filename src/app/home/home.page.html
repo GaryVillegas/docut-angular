@@ -19,16 +19,17 @@
     </ion-row>
     <ion-row>
       @if(cita){
-      <ion-card color="tertiary">
-        <ion-card-header>
-          <ion-card-title>
+      <ion-card color="tertiary" class="appointment-card">
+        <div>
+          <h3>
+            <ion-icon name="calendar-clear-outline"></ion-icon>
+            {{serviceCitaName}}
+          </h3>
+          <p>
             {{cita.citaData.nombreUsuario}} {{cita.citaData.apellidoUsuario}}
-          </ion-card-title>
-          <ion-card-subtitle> {{cita.citaData.idServicio}} </ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
+          </p>
           <p>Hora Cita: {{cita.citaData.horaSeleccionada}}</p>
-        </ion-card-content>
+        </div>
       </ion-card>
       } @else {
       <ion-card color="tertiary" class="appointment-card">
