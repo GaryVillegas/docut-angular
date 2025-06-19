@@ -47,6 +47,13 @@ ion-datetime::part(calendar-day active) {
   transition: transform 0.3s ease;
 }
 
+.slide:last-child {
+  ion-datetime {
+    --background: white;
+    border-radius: 16px;
+  }
+}
+
 ion-input {
   --padding-start: 10px;
   --padding-end: 10px;
