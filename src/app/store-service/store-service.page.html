@@ -20,7 +20,7 @@
   </ion-grid>
 
   <!-- 🛠️ LISTA DE SERVICIOS - Solo corregida la sintaxis -->
-  <div *ngFor="let service of storeData.services">
+  <div *ngFor="let service of serviceData">
     <ion-card class="ion-padding">
       <ion-card-header>
         <ion-card-subtitle>
@@ -59,10 +59,7 @@
   </div>
 
   <!-- 📝 Mensaje cuando no hay servicios -->
-  <div
-    *ngIf="storeData.services.length === 0 && !isLoading"
-    class="ion-text-center ion-padding"
-  >
+  <div *ngIf="!serviceData && !isLoading" class="ion-text-center ion-padding">
     <ion-icon name="construct-outline" size="large" color="medium"></ion-icon>
     <p>No tienes servicios creados</p>
     <p>¡Crea tu primer servicio!</p>

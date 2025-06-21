@@ -1,44 +1,27 @@
-import {
-  Component,
-  type OnInit,
-  type OnDestroy,
-  ViewChild,
-} from '@angular/core';
-import type { ServiceStoreData, StoreCompleteData } from '../types/store';
+import { Component, type OnInit, ViewChild } from '@angular/core';
 import { StoreService } from '../store.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController } from '@ionic/angular';
 import type { IonPopover } from '@ionic/angular/standalone';
-import { Subject, takeUntil } from 'rxjs';
-
+import { service, serviceData } from '../types/service.type';
 @Component({
   selector: 'app-store-service',
   templateUrl: './store-service.page.html',
   styleUrls: ['./store-service.page.scss'],
   standalone: false,
 })
-export class StoreServicePage implements OnInit, OnDestroy {
+export class StoreServicePage implements OnInit {
   @ViewChild('popover') popover!: IonPopover;
+  user: any | null = null;
+  storeId: string | undefined;
+  serviceData: serviceData[] | undefined;
 
-  // 🧹 Para limpiar suscripciones y evitar memory leaks
-  private destroy$ = new Subject<void>();
-
-  // 📊 TODOS los datos que necesita la página en una sola variable
-  storeData: StoreCompleteData = {
-    storeInfo: {
-      userUID: '',
-      storeInfo: { bussinessName: '', direction: '', categories: [] },
-    },
-    storeIds: [],
-    services: [],
-  };
-
-  // 📝 Datos del formulario para crear servicio
-  newService: ServiceStoreData = {
+  newService: service = {
     nombreServicio: '',
     descripcionServicio: '',
     tiempoEstimado: '',
     precio: 0,
+    storeId: '',
   };
 
   // 🎛️ Estados de la interfaz
@@ -57,83 +40,51 @@ export class StoreServicePage implements OnInit, OnDestroy {
   };
 
   constructor(
-    private storeServ: StoreService,
+    private storeService: StoreService,
     private auth: AngularFireAuth,
     private toast: ToastController
   ) {}
 
   ngOnInit() {
+    this.user = this.auth.currentUser;
     this.loadData();
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
    * 🚀 FUNCIÓN PRINCIPAL - Carga todos los datos
    * Solo una llamada al servicio, él hace todo el trabajo
    */
-  private loadData() {
+  private async loadData() {
     this.isLoading = true;
-
-    this.auth.authState.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (user) => {
-        if (!user) {
-          this.showAlert('No estás autenticado');
-          this.isLoading = false;
-          return;
-        }
-
-        // 🎯 UNA SOLA LLAMADA - el servicio hace todo
-        this.storeServ
-          .getCompleteStoreData(user.uid)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: (data) => {
-              this.storeData = data;
-              console.log('📊 Datos cargados:', data);
-              this.isLoading = false;
-            },
-            error: (error) => {
-              console.error('❌ Error:', error);
-              this.showAlert('Error al cargar datos');
-              this.isLoading = false;
-            },
-          });
-      },
-    });
+    try {
+      if (!this.user) {
+        this.showAlert('No estas autenticado');
+        return;
+      }
+      const storeData = await this.storeService.getStoreID(this.user.uid);
+      this.storeId = storeData;
+      if (this.storeId) {
+        const serviceData = await this.storeService.getStoreServices(
+          this.storeId
+        );
+        this.serviceData = serviceData;
+        console.log('Servicios encontrados.');
+      }
+      console.log('storeId encontrador');
+    } catch (error) {
+      this.showAlert('Error al cargar storeId.');
+    } finally {
+      this.isLoading = false;
+    }
   }
 
-  /**
-   * ➕ Crear nuevo servicio - ALGORITMO ORIGINAL CON STOREID
-   */
   async createService() {
-    // Validar datos
     if (!this.isValidService()) return;
-
     this.isLoading = true;
-
     try {
-      const user = await this.auth.currentUser;
-      if (!user) throw new Error('No estás autenticado');
-
-      // 🔥 ALGORITMO ORIGINAL: Obtener storeId primero
-      const storeIds = await this.storeServ.getStoreIdsByUserUID(user.uid);
-
-      if (storeIds.length === 0) {
-        throw new Error('No tienes tiendas creadas');
-      }
-
-      // 🔥 USAR EL MÉTODO ORIGINAL CON STOREID
-      await this.storeServ.createServiceStore(storeIds[0], this.newService);
-
-      // Éxito
-      this.showToast('✅ Servicio creado');
-      this.resetForm();
-      this.setOpenCreateModal(false);
-      this.loadData(); // Recargar para mostrar el nuevo servicio
+      if (!this.storeId) return;
+      await this.storeService.createService(this.storeId, this.newService);
+      this.showToast('Servicio Creado!');
     } catch (error) {
       console.error('❌ Error:', error);
       this.showAlert('Error al crear servicio');
@@ -174,6 +125,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
       descripcionServicio: '',
       tiempoEstimado: '',
       precio: 0,
+      storeId: '',
     };
     this.currentSlideIndex = 0;
   }
@@ -184,6 +136,7 @@ export class StoreServicePage implements OnInit, OnDestroy {
       descripcionServicio: '',
       tiempoEstimado: '',
       precio: 0,
+      storeId: '',
     };
     this.currentSlideIndex = 0;
   }
@@ -200,10 +153,6 @@ export class StoreServicePage implements OnInit, OnDestroy {
 
   prevSlide() {
     this.currentSlideIndex = 0;
-  }
-
-  handleSubmit() {
-    this.createService();
   }
 
   presentPopover(event: Event, buttonId: string) {
@@ -255,11 +204,12 @@ export class StoreServicePage implements OnInit, OnDestroy {
   }
 
   // ✏️ Datos del formulario para editar servicio
-  editService: ServiceStoreData = {
+  editService: service = {
     nombreServicio: '',
     descripcionServicio: '',
     tiempoEstimado: '',
     precio: 0,
+    storeId: '',
   };
 
   editCurrentService() {
@@ -271,16 +221,17 @@ export class StoreServicePage implements OnInit, OnDestroy {
           this.currentService.serviceData.descripcionServicio || '',
         tiempoEstimado: this.currentService.serviceData.tiempoEstimado || '',
         precio: this.currentService.serviceData.precio || 0,
+        storeId: this.currentService.serviceData.storeId || '',
       };
       this.setModalServiceOpen(true);
     }
   }
 
   async editServiceData() {
-    if (this.currentService && this.currentService.documentId) {
+    if (this.currentService && this.currentService.serviceId) {
       try {
-        await this.storeServ.updateService(
-          this.currentService.documentId,
+        await this.storeService.updateService(
+          this.currentService.serviceId,
           this.editService
         );
         this.setModalServiceOpen(false);
@@ -288,7 +239,8 @@ export class StoreServicePage implements OnInit, OnDestroy {
         this.loadData();
         this.showToast('✅ Servicio editado');
       } catch (error) {
-        console.error('Error al actualizar el servicio:', error);
+        console.log('error al editar servicio: ', error);
+        this.showAlert('❌Error al editar servicio.');
       }
     }
   }
@@ -297,6 +249,23 @@ export class StoreServicePage implements OnInit, OnDestroy {
   isAlertServiceOpen = false;
   setAlertServiceOpen(isOpen: boolean) {
     this.isAlertServiceOpen = isOpen;
+  }
+
+  async deleteService() {
+    if (this.currentService && this.currentService.serviceId) {
+      try {
+        await this.storeService.deleteService(this.currentService.documentId);
+        this.setAlertServiceOpen(false);
+        this.isOptionsPopoverOpen = false;
+        this.showToast('✅ Servicio eliminado');
+        this.loadData(); // Recargar para reflejar cambios
+      } catch (error) {
+        console.error('Error al eliminar el servicio:', error);
+        this.showAlert('Error al eliminar servicio');
+      }
+    } else {
+      this.showAlert('No se pudo identificar el servicio a eliminar');
+    }
   }
 
   public alertServiceButtons = [
@@ -320,23 +289,6 @@ export class StoreServicePage implements OnInit, OnDestroy {
     if (this.currentService) {
       console.log('Eliminar servicio:', this.currentService);
       this.setAlertServiceOpen(true);
-    }
-  }
-
-  async deleteService() {
-    if (this.currentService && this.currentService.documentId) {
-      try {
-        await this.storeServ.deleteService(this.currentService.documentId);
-        this.setAlertServiceOpen(false);
-        this.isOptionsPopoverOpen = false;
-        this.showToast('✅ Servicio eliminado');
-        this.loadData(); // Recargar para reflejar cambios
-      } catch (error) {
-        console.error('Error al eliminar el servicio:', error);
-        this.showAlert('Error al eliminar servicio');
-      }
-    } else {
-      this.showAlert('No se pudo identificar el servicio a eliminar');
     }
   }
 }

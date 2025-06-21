@@ -6,8 +6,6 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Observable, combineLatest } from 'rxjs';
-import { map, take, switchMap } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
 @Injectable({
@@ -20,36 +18,37 @@ export class AuthGuard implements CanActivate {
     private storeService: StoreService
   ) {}
 
-  canActivate(
+  async canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
-    return this.auth.authState.pipe(
-      take(1),
-      switchMap((user) => {
-        if (!user) {
-          console.log('access denied');
-          this.router.navigate(['/login']);
-          return [false];
-        }
+  ): Promise<boolean> {
+    const user = await this.auth.currentUser;
 
-        // Verificar si el usuario tiene información en Firestore
-        return this.storeService.getUserData(user.uid).pipe(
-          map((userData) => {
-            const hasUserInfo =
-              userData.userInfoData.name !== '' &&
-              userData.userInfoData.lastName !== '' &&
-              userData.userInfoData.rut !== '';
+    if (!user) {
+      console.log('🚫 Acceso denegado: usuario no autenticado');
+      this.router.navigate(['/login']);
+      return false;
+    }
 
-            if (!hasUserInfo) {
-              this.router.navigate(['/user-info']);
-              return false;
-            } else {
-              return true;
-            }
-          })
-        );
-      })
-    );
+    try {
+      const userData = await this.storeService.getUserData(user.uid);
+
+      if (
+        !userData ||
+        !userData.userInfo.name ||
+        !userData.userInfo.lastName ||
+        !userData.userInfo.rut
+      ) {
+        console.log('⚠️ Información de usuario incompleta');
+        this.router.navigate(['/user-info']);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ Error al obtener datos del usuario:', error);
+      this.router.navigate(['/login']);
+      return false;
+    }
   }
 }

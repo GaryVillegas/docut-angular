@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { StoreService } from '../store.service';
-import { getUserStoreData } from '../types/store';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { storeData } from '../types/store.type';
 
 @Component({
   selector: 'app-store',
@@ -12,15 +12,7 @@ import { Router } from '@angular/router';
   standalone: false,
 })
 export class StorePage implements OnInit {
-  userStoreData: getUserStoreData = {
-    userUID: '',
-    documentId: '',
-    storeInfo: {
-      bussinessName: '',
-      direction: '',
-      categories: [],
-    },
-  };
+  storeData: storeData | undefined;
   isLoading = true;
 
   constructor(
@@ -41,11 +33,14 @@ export class StorePage implements OnInit {
       this.showAlert('No hay un usuario autenticado.');
       return;
     }
-    await this.storeServ.getStoreByUID(user.uid).subscribe((storeData) => {
-      this.userStoreData = storeData;
-      this.isLoading = false;
-      console.log(storeData);
-    });
+    try {
+      const result = await this.storeServ.getUserStore(user.uid);
+      this.storeData = result;
+      this.showToast('Exito', 'Se encontro su tienda.');
+    } catch (error) {
+      console.log('error al buscar tienda: ', error);
+      this.showAlert('Error al buscar su tienda.');
+    }
   }
 
   async showToast(header: string, message: string) {
@@ -98,9 +93,10 @@ export class StorePage implements OnInit {
 
   async deleteStore() {
     try {
-      await this.storeServ.deleteStore(this.userStoreData.documentId);
-      await this.storeServ.updateUserType(
-        this.userStoreData.userUID,
+      if (!this.storeData) return;
+      await this.storeServ.deleteStore(this.storeData?.storeId);
+      await this.storeServ.updateUserTipe(
+        this.storeData?.storeInfo.userUID,
         'cliente'
       );
       this.setAlertDeleteOpen(false);
@@ -129,24 +125,27 @@ export class StorePage implements OnInit {
   ];
 
   toggleCategory(category: string) {
-    const index = this.userStoreData.storeInfo?.categories.indexOf(category);
+    if (!this.storeData) return;
+    const index = this.storeData.storeInfo?.categories.indexOf(category);
     if (index > -1) {
-      this.userStoreData.storeInfo?.categories.splice(index, 1);
+      this.storeData.storeInfo?.categories.splice(index, 1);
     } else {
-      this.userStoreData.storeInfo.categories.push(category);
+      this.storeData.storeInfo.categories.push(category);
     }
     this.cdRef.markForCheck();
   }
 
   isCategorySelected(category: string): boolean {
-    return this.userStoreData.storeInfo.categories.includes(category);
+    if (!this.storeData) return false;
+    return this.storeData.storeInfo.categories.includes(category);
   }
 
   async updateStore() {
+    if (!this.storeData) return;
     try {
       await this.storeServ.updateStore(
-        this.userStoreData.documentId,
-        this.userStoreData.storeInfo
+        this.storeData.storeId,
+        this.storeData.storeInfo
       );
       this.showToast('Exito', '✅ Tienda actualizada');
       this.isLoading = false;

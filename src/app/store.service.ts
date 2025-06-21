@@ -11,425 +11,296 @@ import {
   limit,
   updateDoc,
   deleteDoc,
-  onSnapshot,
 } from '@angular/fire/firestore';
-import { from, Observable, of } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
-import type {
-  getUserStoreData,
-  ServiceStoreData,
-  ServiceData,
-  StoreCompleteData,
-  getServiceData,
-  StoreInfo,
-} from './types/store';
-import type { UserData, UserInfoData } from './types/user';
-import { cita, getCita } from './types/date';
+import { userInfo, userData } from './types/user.type';
+import { storeData, storeInfo } from './types/store.type';
+import { service, serviceData } from './types/service.type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StoreService {
-  constructor(private firestore: Firestore) {}
+  constructor(private FIREBASE_DB: Firestore) {}
+
+  //all create Functions
 
   /**
-   * 🏪 SOLO DATOS DE LA TIENDA - Para store.page.ts
-   * Función simple que solo trae información básica de la tienda
+   * @param uid
+   * @param userInfo
+   * Para crear un usuario con su informacion
    */
-  getStoreData(userUID: string): Observable<getUserStoreData> {
-    console.log('🏪 Buscando datos de tienda para:', userUID);
-
-    const q = query(
-      collection(this.firestore, 'stores'),
-      where('userUID', '==', userUID),
-      limit(1)
-    );
-
-    return from(getDocs(q)).pipe(
-      map((querySnapshot) => {
-        const storeData: getUserStoreData = querySnapshot.empty
-          ? {
-              userUID,
-              documentId: '',
-              storeInfo: { bussinessName: '', direction: '', categories: [] },
-            }
-          : {
-              userUID,
-              documentId: querySnapshot.docs[0].id,
-              storeInfo: querySnapshot.docs[0].data()?.['storeInfo'] || {
-                bussinessName: '',
-                direction: '',
-                categories: [],
-              },
-            };
-
-        console.log('✅ Datos de tienda cargados:', storeData);
-        return storeData;
-      }),
-      catchError((error) => {
-        console.error('❌ Error cargando tienda:', error);
-        throw error;
-      })
-    );
-  }
-
-  /**
-   * 🛠️ SOLO SERVICIOS - Para store-service.page.ts
-   * Busca el ID de la tienda y luego trae solo los servicios
-   */
-  getStoreServices(userUID: string): Observable<ServiceData[]> {
-    console.log('🛠️ Buscando servicios para usuario:', userUID);
-
-    // Paso 1: Obtener ID de la tienda
-    return this.getStoreIds(userUID).pipe(
-      switchMap((storeIds) => {
-        if (storeIds.length === 0) {
-          console.log('⚠️ No hay tiendas, devolviendo servicios vacíos');
-          return of([]);
-        }
-
-        // Paso 2: Buscar servicios de la primera tienda
-        return this.getServicesByStoreId(storeIds[0]);
-      }),
-      catchError((error) => {
-        console.error('❌ Error cargando servicios:', error);
-        return of([]); // Devolver array vacío en caso de error
-      })
-    );
-  }
-
-  /**
-   * 🆔 Obtener IDs de tiendas (función auxiliar)
-   */
-  private getStoreIds(userUID: string): Observable<string[]> {
-    const q = query(
-      collection(this.firestore, 'stores'),
-      where('userUID', '==', userUID)
-    );
-
-    return from(getDocs(q)).pipe(
-      map((querySnapshot) => {
-        const storeIds = querySnapshot.docs.map((doc) => doc.id);
-        console.log('🆔 IDs de tienda encontrados:', storeIds);
-        return storeIds;
-      })
-    );
-  }
-
-  /**
-   * 📋 Busca servicios de una tienda específica
-   */
-  getServicesByStoreId(storeId: string): Observable<getServiceData[]> {
-    const q = query(
-      collection(this.firestore, 'service'),
-      where('storeId', '==', storeId)
-    );
-
-    return from(getDocs(q)).pipe(
-      map((querySnapshot) => {
-        const services = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            documentId: doc.id,
-            storeId: data['storeId'],
-            serviceData: data['serviceData'],
-          } as getServiceData;
-        });
-        console.log('✅ Servicios encontrados:', services.length);
-        return services;
-      })
-    );
-  }
-
-  /**
-   * 📋 Busca servicios segun su id
-   */
-  getServiceById(serviceId: string): Observable<getServiceData> {
-    const docRef = doc(this.firestore, 'service', serviceId);
-    return from(getDoc(docRef)).pipe(
-      map((serviceDoc) => ({
-        documentId: serviceId,
-        storeId: serviceDoc.exists() ? serviceDoc.data()?.['storeId'] : '',
-        serviceData: serviceDoc.exists()
-          ? serviceDoc.data()?.['serviceData']
-          : [],
-      }))
-    );
-  }
-
-  /**
-   * ➕ Crear servicio - Versión simplificada
-   */
-  async createServiceForUser(
-    userUID: string,
-    serviceData: ServiceStoreData
-  ): Promise<void> {
-    console.log('➕ Creando servicio para usuario:', userUID);
-
-    // Paso 1: Obtener ID de la tienda
-    const storeIds = await this.getStoreIdsAsync(userUID);
-    if (storeIds.length === 0) {
-      throw new Error('No tienes tiendas creadas');
+  async createUser(uid: string, userInfo: userInfo): Promise<void> {
+    try {
+      if (!uid || !userInfo) {
+        throw new Error('Toda la información en requerida.');
+      }
+      await setDoc(doc(this.FIREBASE_DB, 'users', uid), { userInfo });
+      console.log('User Info created successfully');
+    } catch (error) {
+      console.error('Erroo creating user info: ', error);
+      throw error;
     }
-
-    // Paso 2: Crear el servicio
-    await this.createService(storeIds[0], serviceData);
-    console.log('✅ Servicio creado exitosamente');
   }
 
   /**
-   * 🆔 Versión async para obtener IDs (para crear servicios)
+   * @param userUID
+   * @param storeInfo
+   * Para crear una tienda con su informacion
    */
-  private async getStoreIdsAsync(userUID: string): Promise<string[]> {
-    const q = query(
-      collection(this.firestore, 'stores'),
-      where('userUID', '==', userUID)
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => doc.id);
+  async createStore(userUID: string, storeInfo: storeInfo): Promise<void> {
+    try {
+      if (!userUID || !storeInfo) {
+        throw new Error('Toda la información es requerida.');
+      }
+      const storeId = `${Date.now().toLocaleString()}_${userUID}`;
+      await setDoc(doc(this.FIREBASE_DB, 'stores', storeId), {
+        userUID,
+        storeInfo,
+      });
+      console.log('Store created successfully!');
+    } catch (error) {
+      console.log('Error creating store: ', error);
+      throw error;
+    }
   }
 
   /**
-   * 💾 Crear servicio en Firebase
+   * @param storeId
+   * @param serviceData
+   * Para crear un servicio con su informacion
    */
-  private async createService(
-    storeId: string,
-    serviceData: ServiceStoreData
-  ): Promise<void> {
-    const serviceId = `${Date.now()}_${storeId}`;
-    const serviceDocument: ServiceData = {
-      storeId,
-      serviceData,
-    };
+  async createService(storeId: string, serviceData: service): Promise<void> {
+    try {
+      if (!serviceData || !storeId)
+        throw new Error('Service data are requiered.');
+      const serviceId = `${Date.now().toLocaleString()}_${storeId}`;
 
-    await setDoc(doc(this.firestore, 'service', serviceId), serviceDocument);
+      await setDoc(doc(this.FIREBASE_DB, 'service', serviceId), {
+        serviceData,
+      });
+      console.log('service created successfully!');
+    } catch (error) {
+      console.error('Error creating service: ', error);
+      throw error;
+    }
   }
 
-  // 📝 Funciones originales mantenidas para compatibilidad
-  getCompleteStoreData(userUID: string): Observable<StoreCompleteData> {
-    return this.getStoreData(userUID).pipe(
-      switchMap((storeInfo) => {
-        return this.getStoreServices(userUID).pipe(
-          map((services) => ({
-            storeInfo,
-            storeIds: [], // Se puede llenar si es necesario
-            services,
-          }))
-        );
-      })
-    );
+  //all gets
+  /**
+   * @param uid
+   * @returns
+   * retorna los datos del usuario.
+   */
+  async getUserData(uid: string): Promise<userData | undefined> {
+    try {
+      const userRef = doc(this.FIREBASE_DB, 'users', uid);
+      const userSnapshot = await getDoc(userRef);
+      if (!userSnapshot.exists()) {
+        console.warn("🚫 service doesn't exit.");
+        return undefined;
+      }
+      const data = userSnapshot.data();
+      return {
+        UID: uid,
+        userInfo: data,
+      } as userData;
+    } catch (error) {
+      console.log('❌ error catching service: ', error);
+      throw error;
+    }
   }
 
-  getAllStores(): Observable<getUserStoreData[]> {
-    return new Observable((observer) => {
-      const unsubscribe = onSnapshot(
-        collection(this.firestore, 'stores'),
-        (snapshot) => {
-          const stores = snapshot.docs.map(
-            (doc) =>
-              ({
-                documentId: doc.id,
-                userUID: doc.data()['userUID'],
-                storeInfo: doc.data()['storeInfo'],
-              } as getUserStoreData)
-          );
-          observer.next(stores);
-        },
-        (error) => observer.error(error)
-      );
-
-      return () => unsubscribe();
-    });
-  }
-
-  async createUserInfo(UID: string, userInfo: any): Promise<void> {
-    await setDoc(doc(this.firestore, 'users', UID), { userInfo });
-  }
-
-  async createUserStore(userUID: string, storeInfo: any): Promise<void> {
-    const storeId = `${Date.now()}_${userUID}`;
-    await setDoc(doc(this.firestore, 'stores', storeId), {
-      userUID,
-      storeInfo,
-    });
-  }
-
-  //Obtener la cita del usuario
-  getCitaData(userUID: string): Observable<getCita | null> {
-    const citaPromise = (async () => {
-      const citaRef = collection(this.firestore, 'cita');
-      const fechaHoy = new Date().toISOString().split('T')[0];
-      // Cambiamos 'idUsuario' por 'cita.idUsuario' ya que los datos están anidados
-      const q = query(
-        citaRef,
-        where('cita.idUsuario', '==', userUID),
-        where('cita.fechaSeleccionada', '==', fechaHoy),
+  /**
+   * @param userUID
+   * @returns storeID
+   * Función que devuelve storeId.
+   */
+  async getStoreID(userUID: string): Promise<string | undefined> {
+    try {
+      if (!userUID) {
+        throw new Error('userUID required.');
+      }
+      const storeQuery = query(
+        collection(this.FIREBASE_DB, 'stores'),
+        where('userUID', '==', userUID),
         limit(1)
       );
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0];
-        const data = doc.data();
+      const storeSnapshot = await getDocs(storeQuery);
+      const store = storeSnapshot.docs.map((doc) => {
+        const storeData = doc.data();
         return {
-          id: doc.id,
-          citaData: data['cita'],
-        } as getCita;
-      } else {
-        return null;
-      }
-    })();
-
-    return from(citaPromise);
-  }
-
-  getUserData(uid: string): Observable<UserData> {
-    const userDocRef = doc(this.firestore, 'users', uid);
-    return from(getDoc(userDocRef)).pipe(
-      map((userDoc) => ({
-        UID: uid,
-        userInfoData: userDoc.exists()
-          ? userDoc.data()?.['userInfo']
-          : { name: '', lastName: '', rut: '', tipe: '' },
-      }))
-    );
-  }
-
-  // Mantener para compatibilidad
-  getStoreByUID(uid: string): Observable<getUserStoreData> {
-    return this.getStoreData(uid);
-  }
-
-  async getStoreIdsByUserUID(userUID: string): Promise<string[]> {
-    return this.getStoreIdsAsync(userUID);
-  }
-
-  async getServiceName(serviceId: string): Promise<string | null> {
-    try {
-      if (!serviceId) throw new Error('serviceId are required.');
-      const serviceRef = doc(this.firestore, 'service', serviceId);
-      const serviceSnapshot = await getDoc(serviceRef);
-      if (!serviceSnapshot.exists())
-        throw new Error('Este servicio no existe.');
-      const serviceName =
-        serviceSnapshot.data()?.['serviceData']?.['nombreServicio'];
-      return serviceName;
-    } catch (error) {
-      console.log('Error catching service name: ', error);
-      throw error;
-    }
-  }
-
-  async createServiceStore(storeID: string, serviceData: ServiceStoreData) {
-    try {
-      if (!storeID || !serviceData) {
-        throw new Error('UID and userInfo are required');
-      }
-
-      const serviceId = `${Date.now()}_${storeID}`;
-
-      await setDoc(doc(this.firestore, 'service', serviceId), {
-        storeId: storeID,
-
-        serviceData: serviceData,
+          storeId: doc.id,
+          storeInfo: storeData,
+        } as storeData;
       });
-
-      console.log('Servico creado.');
+      console.log('Store catch: ', store);
+      return store[0].storeId;
     } catch (error) {
-      console.error('Error al crear el servicio: ', error);
+      console.log('Error catching Store: ', error);
       throw error;
     }
   }
 
-  async createCita(citaData: cita) {
+  //Funciones para obtener los datos
+  /**
+   * @param storeId
+   * @returns
+   * funcion para traer los servicios de la tienda.
+   */
+  async getStoreServices(storeId: string): Promise<serviceData[] | undefined> {
     try {
-      if (!citaData) {
-        throw new Error('Los datos son requeridos.');
-      }
-      const id = `${citaData.idUsuario}-${Date.now()}`;
-      await setDoc(doc(this.firestore, 'cita', id), {
-        cita: citaData,
+      const serviceQuery = query(
+        collection(this.FIREBASE_DB, 'service'),
+        where('serviceData.storeId', '==', storeId)
+      );
+      const serviceSnapshot = await getDocs(serviceQuery);
+      const services = serviceSnapshot.docs.map((service) => {
+        const serviceData = service.data();
+        return {
+          serviceId: service.id,
+          serviceData: serviceData,
+        } as serviceData;
       });
-      console.log('cita creada');
+      console.log('✅ Services catchs: ', services);
+      return services;
     } catch (error) {
-      console.error('Error al crear la cita: ', error);
+      console.log('❌ error catching services: ', error);
       throw error;
     }
   }
 
-  async updateUserType(uid: string, type: string): Promise<void> {
-    const userDocRef = doc(this.firestore, 'users', uid);
-    await updateDoc(userDocRef, { 'userInfo.tipe': type });
-  }
-
-  async updateUser(uid: string, userInfo: UserInfoData) {
+  /**
+   * @param userUID
+   * @returns los datos de la tienda creada por el usuario.
+   */
+  async getUserStore(userUID: string): Promise<storeData | undefined> {
     try {
-      const userDocRef = doc(this.firestore, 'users', uid);
-      await updateDoc(userDocRef, { userInfo });
-      console.log('✅ Usuario actualizado:', uid);
-    } catch (error) {
-      console.error('❌ Error actualizando usuario:', error);
-      throw error;
-    }
-  }
-
-  async updateService(
-    documentId: string,
-    serviceData: ServiceStoreData
-  ): Promise<void> {
-    try {
-      const serviceDocRef = doc(this.firestore, 'service', documentId);
-      await updateDoc(serviceDocRef, {
-        serviceData: serviceData,
+      if (!userUID) throw new Error('userUID required.');
+      const storeQuery = query(
+        collection(this.FIREBASE_DB, 'stores'),
+        where('userUID', '==', userUID),
+        limit(1)
+      );
+      const storeSnapshot = await getDocs(storeQuery);
+      const store = storeSnapshot.docs.map((store) => {
+        const storeData = store.data();
+        return {
+          storeId: store.id,
+          storeInfo: storeData,
+        } as storeData;
       });
-      console.log('✅ Servicio actualizado:', documentId);
+      console.log('Store catch: ', store);
+      return store[0];
     } catch (error) {
-      console.error('❌ Error actualizando servicio:', error);
+      console.log('Error catching Store: ', error);
       throw error;
     }
   }
 
-  async updateStore(storeId: string, storeData: StoreInfo) {
+  //Updatings
+
+  /**
+   * @param uid
+   * @param userInfo
+   * Funcion para actualizar la informacion del usuario, necesaria.
+   */
+  async updateUser(uid: string, userInfo: userInfo): Promise<void> {
     try {
-      const storeDocRef = doc(this.firestore, 'stores', storeId);
-      await updateDoc(storeDocRef, {
-        storeInfo: storeData,
-      });
-      console.log('✅ Tienda actualizada:', storeId);
+      const userRef = doc(this.FIREBASE_DB, 'users', uid);
+      await updateDoc(userRef, { userInfo });
+      console.log('✅ User updated:', uid);
     } catch (error) {
-      console.error('❌ Error actualizando tienda:', error);
+      console.error('❌ Error updating user:', error);
       throw error;
     }
   }
 
-  async deleteService(documentId: string) {
+  /**
+   * @param uid
+   * @param tipe
+   * Con estos dos parametros se actuliza el usuario a administrador.
+   */
+  async updateUserTipe(uid: string, tipe: string): Promise<void> {
+    const userDocRef = doc(this.FIREBASE_DB, 'users', uid);
     try {
-      await deleteDoc(doc(this.firestore, 'service', documentId));
-      console.log('✅ Servicio eliminado:', documentId);
+      await updateDoc(userDocRef, { 'userInfo.tipe': tipe });
+      console.log('user successfully updated!');
+    } catch (error) {
+      console.error('Error updating user: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param serviceId
+   * @param serviceData
+   * Funcion para actualizar servicios.
+   */
+  async updateService(serviceId: string, serviceData: service): Promise<void> {
+    try {
+      const serviceRef = doc(this.FIREBASE_DB, 'service', serviceId);
+      await updateDoc(serviceRef, { serviceData });
+      console.log('✅ Service updated:', serviceId);
+    } catch (error) {
+      console.error('❌ Error updating service:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param storeId
+   * @param storeData
+   * Funcion para actualizar tienda.
+   */
+  async updateStore(storeId: string, storeData: storeInfo): Promise<void> {
+    try {
+      const storeRef = doc(this.FIREBASE_DB, 'stores', storeId);
+      await updateDoc(storeRef, { storeData });
+      console.log('✅ Store updated:', storeId);
+    } catch (error) {
+      console.error('❌ Error updating store:', error);
+      throw error;
+    }
+  }
+
+  //All Delets
+  /**
+   * @param serviceId
+   * Funcion para eliminar un servicio en base a su id
+   */
+  async deleteService(serviceId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(this.FIREBASE_DB, 'service', serviceId));
+      console.log('✅ Servicio eliminado:', serviceId);
     } catch (error) {
       console.error('❌ Error eliminar servicio:', error);
       throw error;
     }
   }
 
-  async deleteStore(documentId: string) {
+  /**
+   * @param storeId
+   * con solo este parametro se eliminaran los datos de la tienda
+   */
+  async deleteStore(storeId: string): Promise<void> {
     try {
-      const servicesQuery = query(
-        collection(this.firestore, 'service'),
-        where('storeId', '==', documentId)
+      const serviceQuery = query(
+        collection(this.FIREBASE_DB, 'service'),
+        where('storeId', '==', storeId)
       );
-      const servicesSnapshot = await getDocs(servicesQuery);
-      const deleteServicePromises = servicesSnapshot.docs.map((serviceDoc) =>
-        deleteDoc(doc(this.firestore, 'service', serviceDoc.id))
-      );
-      await Promise.all(deleteServicePromises);
+      const serviceSnapshot = await getDocs(serviceQuery);
+      const deleteServicePromise = serviceSnapshot.docs.map((serviceDoc) => {
+        this.deleteService(serviceDoc.id);
+      });
+      await Promise.all(deleteServicePromise);
       console.log(
-        `✅ ${servicesSnapshot.docs.length} servicios eliminados para la tienda: ${documentId}`
+        `✅ ${serviceSnapshot.docs.length} deleted service to store: ${storeId}`
       );
-      await deleteDoc(doc(this.firestore, 'stores', documentId));
-      console.log('✅ Tienda eliminado:', documentId);
+      const storeRef = doc(this.FIREBASE_DB, 'stores', storeId);
+      await deleteDoc(storeRef);
+      console.log('✅ Store deleted: ', storeId);
     } catch (error) {
-      console.error('❌ Error eliminar tienda:', error);
+      console.error('❌ Error deleting store:', error);
       throw error;
     }
   }
