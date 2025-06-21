@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { getUserStoreData, getServiceData } from '../types/store';
 import { StoreService } from '../store.service';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { getCita } from '../types/date';
+import { serviceData } from '../types/service.type';
+import { storeData } from '../types/store.type';
+import { dateData } from '../types/date.type';
 
 @Component({
   selector: 'app-home',
@@ -13,9 +14,9 @@ import { getCita } from '../types/date';
   standalone: false,
 })
 export class HomePage implements OnInit {
-  stores: getUserStoreData[] = [];
-  serviceStore: getServiceData[] = [];
-  cita: getCita | null = null;
+  stores: storeData[] = [];
+  serviceStore: serviceData[] = [];
+  cita: dateData | null = null;
   serviceCitaName: string | null = null;
 
   isLoading = true;
@@ -30,26 +31,8 @@ export class HomePage implements OnInit {
   async ngOnInit() {
     const user = await this.auth.currentUser;
     if (!user) return;
-    this.storeServ.getAllStores().subscribe((stores) => {
-      this.stores = stores;
-      this.isLoading = false;
-      console.log('Todas las Tiendas', stores);
-    });
-    this.storeServ.getCitaData(user.uid).subscribe(async (citaDoc) => {
-      if (citaDoc) {
-        if (user.uid == citaDoc.citaData.idUsuario) {
-          this.cita = citaDoc;
-          this.serviceCitaName = await this.storeServ.getServiceName(
-            citaDoc.citaData.idServicio
-          );
-        } else {
-          this.cita = null;
-          console.log('No se encontro cita');
-        }
-      } else {
-        this.cita = null;
-      }
-    });
+    await this.loadStores();
+    await this.loadDate(user.uid);
   }
 
   //Store Modal View
@@ -71,17 +54,48 @@ export class HomePage implements OnInit {
   }
 
   // Método para obtener la tienda seleccionada
-  getSelectedStore(): getUserStoreData | undefined {
+  getSelectedStore(): storeData | undefined {
     if (!this.storeSelected) return undefined;
-    return this.stores.find((store) => store.documentId === this.storeSelected);
+    return this.stores.find((store) => store.storeId === this.storeSelected);
+  }
+
+  private async loadStores() {
+    try {
+      const result = await this.storeServ.getAllStores();
+      this.stores = result;
+      this.isLoading = false;
+    } catch (error) {
+      this.presentToast('Error', 'error al buscar las tiendas.', 'danger');
+    }
   }
 
   //Metodo para obtener los servicios de la tienda
-  private loadStoreService(storeId: string) {
-    this.storeServ.getServicesByStoreId(storeId).subscribe((services) => {
-      this.serviceStore = services;
-      console.log('servicios cargados: ', this.serviceStore);
-    });
+  private async loadStoreService(storeId: string) {
+    try {
+      const result = await this.storeServ.getServicesByStoreId(storeId);
+      this.serviceStore = result;
+    } catch (error) {
+      this.presentToast(
+        'Error',
+        'error buscar los servicios de la tienda',
+        'danger'
+      );
+    }
+  }
+
+  private async loadDate(userUID: string) {
+    try {
+      const result = await this.storeServ.getUserDate(userUID);
+      this.cita = result;
+      if (result) {
+        const service = await this.storeServ.getServiceName(
+          result.dateData.idServicio
+        );
+        this.serviceCitaName = service;
+      }
+    } catch (error) {
+      this.presentToast('Error', 'Error al buscar una la cita.', 'danger');
+    }
   }
 
   //Mandar datos a cita

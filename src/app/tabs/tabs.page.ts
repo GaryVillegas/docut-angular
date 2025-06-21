@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { StoreService } from '../store.service';
-import { AuthService } from '../auth.service';
-import { UserStoreData } from '../types/store';
-import { UserData } from '../types/user';
+import { storeData } from '../types/store.type';
+import { userData } from '../types/user.type';
 import { Animation, AnimationController } from '@ionic/angular';
-import { Observable, map, switchMap } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-tabs',
@@ -13,9 +12,9 @@ import { Observable, map, switchMap } from 'rxjs';
   standalone: false,
 })
 export class TabsPage implements OnInit {
-  userData: UserData = {
+  userData: userData = {
     UID: '',
-    userInfoData: {
+    userInfo: {
       name: '',
       lastName: '',
       rut: '',
@@ -23,12 +22,13 @@ export class TabsPage implements OnInit {
     },
   };
 
-  userStoreData: UserStoreData = {
-    userUID: '',
+  userStoreData: storeData = {
+    storeId: '',
     storeInfo: {
       bussinessName: '',
       direction: '',
       categories: [],
+      userUID: '',
     },
   };
 
@@ -37,7 +37,7 @@ export class TabsPage implements OnInit {
   isAdmin = false;
   constructor(
     private storeService: StoreService,
-    private authService: AuthService,
+    private authService: Auth,
     private animationCtrl: AnimationController
   ) {
     this.fadeAnim = this.animationCtrl
@@ -47,41 +47,32 @@ export class TabsPage implements OnInit {
       .fromTo('opacity', '0', '1');
   }
 
-  ngOnInit() {
-    this.authService
-      .getCurrentUser()
-      .pipe(
-        switchMap((user) => {
-          if (!user?.uid)
-            return new Observable((subscriber) => subscriber.next(null));
+  async ngOnInit() {
+    try {
+      const user = await this.authService.currentUser;
+      if (!user?.uid) return;
 
-          return this.storeService.getUserData(user.uid).pipe(
-            switchMap((userData) => {
-              this.userData = userData;
-              this.isAdmin = userData.userInfoData.tipe === 'administrador';
+      const userData = await this.storeService.getUserData(user.uid);
+      if (!userData) return;
 
-              if (this.isAdmin) {
-                return this.storeService.getStoreByUID(user.uid).pipe(
-                  map((storeData) => {
-                    this.userStoreData = storeData;
-                    this.showStoreTab = !!storeData?.storeInfo?.bussinessName;
-                    if (this.showStoreTab) {
-                      this.fadeAnim.play();
-                    }
-                    return storeData;
-                  })
-                );
-              }
-              return new Observable((subscriber) => subscriber.next(null));
-            })
-          );
-        })
-      )
-      .subscribe({
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        },
-      });
+      this.userData = userData;
+      this.isAdmin = userData.userInfo.tipe === 'administrador';
+
+      if (this.isAdmin) {
+        const storeData = await this.storeService.getUserStore(user.uid);
+        if (storeData && storeData.storeInfo?.bussinessName) {
+          this.userStoreData = storeData;
+          this.showStoreTab = true;
+          this.fadeAnim.play();
+        } else {
+          this.showStoreTab = false;
+        }
+      } else {
+        this.showStoreTab = false;
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   }
 
   shouldShowStoreTab(): boolean {

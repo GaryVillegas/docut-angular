@@ -45,8 +45,8 @@ export class StoreServicePage implements OnInit {
     private toast: ToastController
   ) {}
 
-  ngOnInit() {
-    this.user = this.auth.currentUser;
+  async ngOnInit() {
+    this.user = await this.auth.currentUser;
     this.loadData();
   }
 
@@ -254,7 +254,7 @@ export class StoreServicePage implements OnInit {
   async deleteService() {
     if (this.currentService && this.currentService.serviceId) {
       try {
-        await this.storeService.deleteService(this.currentService.documentId);
+        await this.storeService.deleteService(this.currentService.serviceId);
         this.setAlertServiceOpen(false);
         this.isOptionsPopoverOpen = false;
         this.showToast('✅ Servicio eliminado');

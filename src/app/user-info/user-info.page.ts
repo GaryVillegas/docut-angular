@@ -36,6 +36,9 @@ export class UserInfoPage {
 
   prevSlide() {
     this.currentSlideIndex--;
+    if (this.currentSlideIndex === 0) {
+      this.router.navigate(['/login']);
+    }
   }
 
   async handleSubmit() {

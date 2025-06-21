@@ -15,6 +15,7 @@ import {
 import { userInfo, userData } from './types/user.type';
 import { storeData, storeInfo } from './types/store.type';
 import { service, serviceData } from './types/service.type';
+import { date, dateData } from './types/date.type';
 
 @Injectable({
   providedIn: 'root',
@@ -85,6 +86,26 @@ export class StoreService {
     }
   }
 
+  /**
+   * @param cita
+   */
+  async createDate(cita: date): Promise<void> {
+    try {
+      if (!cita) {
+        throw new Error('Los datos son requeridos.');
+      }
+
+      const id = `${cita.idUsuario}-${Date.now()}`;
+      await setDoc(doc(this.FIREBASE_DB, 'cita', id), {
+        cita: cita,
+      });
+      console.log('cita creada.');
+    } catch (error) {
+      console.error('Error al crear la cita: ', error);
+      throw error;
+    }
+  }
+
   //all gets
   /**
    * @param uid
@@ -102,7 +123,7 @@ export class StoreService {
       const data = userSnapshot.data();
       return {
         UID: uid,
-        userInfo: data,
+        userInfo: data['userInfo'],
       } as userData;
     } catch (error) {
       console.log('❌ error catching service: ', error);
@@ -130,7 +151,7 @@ export class StoreService {
         const storeData = doc.data();
         return {
           storeId: doc.id,
-          storeInfo: storeData,
+          storeInfo: storeData['storeInfo'],
         } as storeData;
       });
       console.log('Store catch: ', store);
@@ -158,7 +179,7 @@ export class StoreService {
         const serviceData = service.data();
         return {
           serviceId: service.id,
-          serviceData: serviceData,
+          serviceData: serviceData['serviceData'],
         } as serviceData;
       });
       console.log('✅ Services catchs: ', services);
@@ -186,13 +207,133 @@ export class StoreService {
         const storeData = store.data();
         return {
           storeId: store.id,
-          storeInfo: storeData,
+          storeInfo: storeData['storeInfo'],
         } as storeData;
       });
       console.log('Store catch: ', store);
       return store[0];
     } catch (error) {
       console.log('Error catching Store: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @returns all stores.
+   */
+  async getAllStores(): Promise<storeData[]> {
+    try {
+      const storeRef = collection(this.FIREBASE_DB, 'stores');
+      const storeSnapshot = await getDocs(storeRef);
+      const stores = storeSnapshot.docs.map((store) => {
+        const storeData = store.data();
+        return {
+          storeId: store.id,
+          storeInfo: storeData['storeInfo'],
+        } as storeData;
+      });
+      console.log('Stores catch: ', stores);
+      return stores;
+    } catch (error) {
+      console.log('Error catching store: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param userUID
+   * @returns cita de usuario con solo el userUID.
+   */
+  async getUserDate(userUID: string): Promise<dateData> {
+    try {
+      const dateRef = collection(this.FIREBASE_DB, 'cita');
+      const fechaHoy = new Date().toISOString().split('T')[0];
+      const dateQuery = query(
+        dateRef,
+        where('cita.idUsuario', '==', userUID),
+        where('cita.fechaSeleccionada', '==', fechaHoy),
+        limit(1)
+      );
+      const dateSnapshot = await getDocs(dateQuery);
+      const date = dateSnapshot.docs.map((doc) => {
+        const dateData = doc.data();
+        return {
+          dateId: doc.id,
+          dateData: dateData['cita'],
+        } as dateData;
+      });
+      console.log('cita obtenida: ', date);
+      return date[0];
+    } catch (error) {
+      console.log('Error obteniendo cita: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param serviceId
+   * @returns nombre del servicio esperado.
+   */
+  async getServiceName(serviceId: string): Promise<string | null> {
+    try {
+      if (!serviceId) throw new Error('serviceId are required.');
+      const serviceRef = doc(this.FIREBASE_DB, 'service', serviceId);
+      const serviceSnapshot = await getDoc(serviceRef);
+      if (!serviceSnapshot.exists())
+        throw new Error('Este servicio no existe.');
+      const serviceName =
+        serviceSnapshot.data()?.['serviceData']?.['nombreServicio'];
+      return serviceName;
+    } catch (error) {
+      console.log('Error catching service name: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param storeId
+   * @returns servicios de la tienda
+   */
+  async getServicesByStoreId(storeId: string): Promise<serviceData[]> {
+    try {
+      const serviceQuery = query(
+        collection(this.FIREBASE_DB, 'service'),
+        where('serviceData.storeId', '==', storeId)
+      );
+      const serviceSnapshot = await getDocs(serviceQuery);
+      const serviceStore = serviceSnapshot.docs.map((doc) => {
+        const serviceData = doc.data();
+        return {
+          serviceId: doc.id,
+          serviceData: serviceData['serviceData'],
+        } as serviceData;
+      });
+      console.log('Services catch: ', serviceStore);
+      return serviceStore;
+    } catch (error) {
+      console.log('Error catching services: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param serviceId
+   * @returns trae servicio en base a su ID
+   */
+  async getServiceById(serviceId: string): Promise<serviceData> {
+    try {
+      const serviceRef = doc(this.FIREBASE_DB, 'service', serviceId);
+      const serviceSnapshot = await getDoc(serviceRef);
+      if (!serviceSnapshot.exists()) {
+        throw new Error('El servicio no existe');
+      }
+      const serviceData = serviceSnapshot.data();
+      return {
+        serviceId: serviceSnapshot.id,
+        serviceData: serviceData['serviceData'],
+      } as serviceData;
+    } catch (error) {
+      console.log('error catching service: ', error);
       throw error;
     }
   }
@@ -286,7 +427,7 @@ export class StoreService {
     try {
       const serviceQuery = query(
         collection(this.FIREBASE_DB, 'service'),
-        where('storeId', '==', storeId)
+        where('serviceData.storeId', '==', storeId)
       );
       const serviceSnapshot = await getDocs(serviceQuery);
       const deleteServicePromise = serviceSnapshot.docs.map((serviceDoc) => {

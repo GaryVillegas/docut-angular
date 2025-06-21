@@ -77,16 +77,20 @@ export class ProfilePage implements OnInit {
       const userData = await this.storeServ.getUserData(user.uid);
       if (userData) {
         this.userData = userData;
+        this.isLoading = false;
         const storeData = await this.storeServ.getUserStore(user.uid);
         if (storeData) {
           this.userStoreData = storeData;
           console.log('Tienda encontrada');
+          this.isLoading = false;
         }
       }
       console.log('Usuario encontrado');
     } catch (error) {
       console.error('❌ Error esperando auth state:', error);
       this.showAlert('Error de autenticación.');
+      this.isLoading = false;
+    } finally {
       this.isLoading = false;
     }
   }

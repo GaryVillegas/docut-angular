@@ -26,9 +26,9 @@
             {{serviceCitaName}}
           </h3>
           <p>
-            {{cita.citaData.nombreUsuario}} {{cita.citaData.apellidoUsuario}}
+            {{cita.dateData.nombreUsuario}} {{cita.dateData.apellidoUsuario}}
           </p>
-          <p>Hora Cita: {{cita.citaData.horaSeleccionada}}</p>
+          <p>Hora Cita: {{cita.dateData.horaSeleccionada}}</p>
         </div>
       </ion-card>
       } @else {
@@ -43,8 +43,8 @@
       <ion-col>
         <h2 class="title">Disponible</h2>
         <ion-card
+          (click)="setModalStore(true, store.storeId)"
           *ngFor="let store of stores"
-          (click)="setModalStore(true, store.documentId)"
         >
           <ion-card-header>
             <ion-card-title> {{store.storeInfo.bussinessName}} </ion-card-title>
@@ -108,7 +108,7 @@
 
         <ion-card
           *ngFor="let services of serviceStore"
-          (click)="createDate(services.documentId)"
+          (click)="createDate(services.serviceId)"
         >
           <ion-card-header>
             <ion-card-subtitle>

@@ -36,10 +36,11 @@ export class StorePage implements OnInit {
     try {
       const result = await this.storeServ.getUserStore(user.uid);
       this.storeData = result;
-      this.showToast('Exito', 'Se encontro su tienda.');
+      this.isLoading = false;
     } catch (error) {
       console.log('error al buscar tienda: ', error);
       this.showAlert('Error al buscar su tienda.');
+      this.isLoading = false;
     }
   }
 

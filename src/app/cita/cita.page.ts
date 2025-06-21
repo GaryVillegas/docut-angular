@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StoreService } from '../store.service';
-import { getServiceData } from '../types/store';
 import { ToastController } from '@ionic/angular';
 import { tap } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { cita } from '../types/date';
+import { date } from '../types/date.type';
 import {
   TransactionRequest,
   CreateTransactionResponse,
-} from './../types/transbank';
+} from '../types/transbank';
 import { TransbankService } from '../transbank.service';
+import { serviceData } from '../types/service.type';
 
 @Component({
   selector: 'app-cita',
@@ -20,8 +20,8 @@ import { TransbankService } from '../transbank.service';
 })
 export class CitaPage implements OnInit {
   serviceId: string | null = null;
-  serviceData: getServiceData | null = null;
-  cita: cita = {
+  serviceData: serviceData | null = null;
+  cita: date = {
     fechaSeleccionada: '',
     horaSeleccionada: '',
     idNegocio: '',
@@ -58,22 +58,15 @@ export class CitaPage implements OnInit {
   }
 
   //cargar los datos del servicio
-  loadServiceData(id: string) {
-    this.storeServ
-      .getServiceById(id)
-      .pipe(
-        tap((data) => {
-          this.serviceData = data;
-          this.newTransaction.amount = Number(
-            this.serviceData.serviceData.precio
-          );
-          console.log('Service Data: ', data);
-        })
-        /**\
-         * tap: Para efectos secundarios (console.log, asignaciones, llamadas a funciones que no retornan datos)
-         */
-      )
-      .subscribe();
+  async loadServiceData(id: string) {
+    try {
+      const result = await this.storeServ.getServiceById(id);
+      this.serviceData = result;
+      this.newTransaction.amount = Number(this.serviceData.serviceData.precio);
+      console.log('service data: ', result);
+    } catch (error) {
+      this.presentToast('Error', 'error al obtener servicios.', 'danger');
+    }
   }
 
   //algoritmo de seleccion
@@ -132,7 +125,7 @@ export class CitaPage implements OnInit {
       return;
     }
 
-    if (!this.serviceId || !this.serviceData?.storeId) {
+    if (!this.serviceId || !this.serviceData?.serviceData.storeId) {
       this.presentToast(
         'Error',
         'No se ha podido obtener la información del servicio. Por favor, inténtelo de nuevo.',
@@ -142,20 +135,22 @@ export class CitaPage implements OnInit {
     }
 
     this.cita.idServicio = this.serviceId;
-    this.cita.idNegocio = this.serviceData.storeId;
+    this.cita.idNegocio = this.serviceData.serviceData.storeId;
     this.cita.idUsuario = user.uid;
 
     // Aquí iría la lógica para guardar la cita en Firebase o donde sea necesario
     console.log('Datos de la cita listos para guardar:', this.cita);
     try {
-      await this.storeServ.createCita(this.cita);
+      console.log(this.cita);
+      await this.storeServ.createDate(this.cita);
       setTimeout(() => {
         this.route.navigate(['/tabs/home']);
       }, 3000);
     } catch (error) {
+      console.log('error creando cita: ', error);
       this.presentToast(
         'Error',
-        'Hubo un error al crear la cita. Por favor, inténtelo de nuevo.',
+        'Hubo un error al crear la cita. Por favor, inténtelo más tarde.',
         'danger'
       );
     }
