@@ -84,7 +84,9 @@ export class StoreServicePage implements OnInit {
     try {
       if (!this.storeId) return;
       await this.storeService.createService(this.storeId, this.newService);
+      this.setOpenCreateModal(false);
       this.showToast('Servicio Creado!');
+      this.loadData();
     } catch (error) {
       console.error('❌ Error:', error);
       this.showAlert('Error al crear servicio');
