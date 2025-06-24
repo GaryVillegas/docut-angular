@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { StoreService } from '../store.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { UserStoreData } from '../types/store';
+import { storeInfo } from '../types/store.type';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
@@ -19,13 +19,11 @@ import { Router } from '@angular/router';
 export class CreateStorePage {
   currentSlideIndex = 2;
 
-  userStoreData: UserStoreData = {
+  storeInfo: storeInfo = {
     userUID: '',
-    storeInfo: {
-      bussinessName: '',
-      direction: '',
-      categories: [],
-    },
+    bussinessName: '',
+    direction: '',
+    categories: [],
   };
 
   categories = [
@@ -50,17 +48,17 @@ export class CreateStorePage {
   ) {}
 
   toggleCategory(category: string) {
-    const index = this.userStoreData.storeInfo?.categories.indexOf(category);
+    const index = this.storeInfo.categories.indexOf(category);
     if (index > -1) {
-      this.userStoreData.storeInfo?.categories.splice(index, 1);
+      this.storeInfo.categories.splice(index, 1);
     } else {
-      this.userStoreData.storeInfo.categories.push(category);
+      this.storeInfo.categories.push(category);
     }
     this.cdRef.markForCheck();
   }
 
   isCategorySelected(category: string): boolean {
-    return this.userStoreData.storeInfo.categories.includes(category);
+    return this.storeInfo.categories.includes(category);
   }
 
   nextSlide() {
@@ -80,16 +78,13 @@ export class CreateStorePage {
 
     try {
       // Actualiza el tipo de usuario primero
-      await this.storeServ.updateUserType(user.uid, 'administrador');
+      await this.storeServ.updateUserTipe(user.uid, 'administrador');
 
       // Establece el UID en los datos de la tienda
-      this.userStoreData.userUID = user.uid;
+      this.storeInfo.userUID = user.uid;
 
       // Crea la tienda (elimina la condición innecesaria)
-      await this.storeServ.createUserStore(
-        user.uid,
-        this.userStoreData.storeInfo
-      );
+      await this.storeServ.createStore(user.uid, this.storeInfo);
 
       this.showToast('Éxito', 'Tienda creada correctamente.');
       this.router.navigate(['/tabs/home']);

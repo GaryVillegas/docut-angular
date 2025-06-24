@@ -19,16 +19,17 @@
     </ion-row>
     <ion-row>
       @if(cita){
-      <ion-card color="tertiary">
-        <ion-card-header>
-          <ion-card-title>
-            {{cita.citaData.nombreUsuario}} {{cita.citaData.apellidoUsuario}}
-          </ion-card-title>
-          <ion-card-subtitle> {{cita.citaData.idServicio}} </ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <p>Hora Cita: {{cita.citaData.horaSeleccionada}}</p>
-        </ion-card-content>
+      <ion-card color="tertiary" class="appointment-card">
+        <div>
+          <h3>
+            <ion-icon name="calendar-clear-outline"></ion-icon>
+            {{serviceCitaName}}
+          </h3>
+          <p>
+            {{cita.dateData.nombreUsuario}} {{cita.dateData.apellidoUsuario}}
+          </p>
+          <p>Hora Cita: {{cita.dateData.horaSeleccionada}}</p>
+        </div>
       </ion-card>
       } @else {
       <ion-card color="tertiary" class="appointment-card">
@@ -42,8 +43,8 @@
       <ion-col>
         <h2 class="title">Disponible</h2>
         <ion-card
+          (click)="setModalStore(true, store.storeId)"
           *ngFor="let store of stores"
-          (click)="setModalStore(true, store.documentId)"
         >
           <ion-card-header>
             <ion-card-title> {{store.storeInfo.bussinessName}} </ion-card-title>
@@ -107,7 +108,7 @@
 
         <ion-card
           *ngFor="let services of serviceStore"
-          (click)="createDate(services.documentId)"
+          (click)="createDate(services.serviceId)"
         >
           <ion-card-header>
             <ion-card-subtitle>

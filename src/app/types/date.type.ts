@@ -1,4 +1,4 @@
-export interface cita {
+export interface date {
   fechaSeleccionada: string;
   horaSeleccionada: string;
   idNegocio: string;
@@ -8,7 +8,7 @@ export interface cita {
   idUsuario: string;
 }
 
-export interface getCita {
-  id: string;
-  citaData: cita;
+export interface dateData {
+  dateId: string;
+  dateData: date;
 }
