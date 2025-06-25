@@ -83,6 +83,7 @@ export class StoreServicePage implements OnInit {
     this.isLoading = true;
     try {
       if (!this.storeId) return;
+      this.newService.storeId = this.storeId;
       await this.storeService.createService(this.storeId, this.newService);
       this.setOpenCreateModal(false);
       this.showToast('Servicio Creado!');

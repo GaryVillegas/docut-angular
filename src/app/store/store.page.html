@@ -87,6 +87,11 @@
             [(ngModel)]="storeData.storeInfo.direction"
             placeholder="Nombre de negocio"
           ></ion-input>
+          <ion-grid>
+            <ion-row>
+              <ion-col> Categorias </ion-col>
+            </ion-row>
+          </ion-grid>
           <div class="categories-grid">
             <ion-chip
               *ngFor="let category of categories"
