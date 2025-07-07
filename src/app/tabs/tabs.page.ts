@@ -30,6 +30,9 @@ export class TabsPage implements OnInit {
       categories: [],
       userUID: '',
     },
+    storeStatus: {
+      statusCondition: false,
+    },
   };
 
   fadeAnim: Animation;

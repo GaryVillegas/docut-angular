@@ -13,7 +13,7 @@ import {
   deleteDoc,
 } from '@angular/fire/firestore';
 import { userInfo, userData } from './types/user.type';
-import { storeData, storeInfo } from './types/store.type';
+import { storeData, storeInfo, storeStatus } from './types/store.type';
 import { service, serviceData } from './types/service.type';
 import { date, dateData } from './types/date.type';
 
@@ -48,7 +48,11 @@ export class StoreService {
    * @param storeInfo
    * Para crear una tienda con su informacion
    */
-  async createStore(userUID: string, storeInfo: storeInfo): Promise<void> {
+  async createStore(
+    userUID: string,
+    storeInfo: storeInfo,
+    storeStatus: storeStatus
+  ): Promise<void> {
     try {
       if (!userUID || !storeInfo) {
         throw new Error('Toda la información es requerida.');
@@ -57,6 +61,7 @@ export class StoreService {
       await setDoc(doc(this.FIREBASE_DB, 'stores', storeId), {
         userUID,
         storeInfo,
+        storeStatus,
       });
       console.log('Store created successfully!');
     } catch (error) {
@@ -152,6 +157,7 @@ export class StoreService {
         return {
           storeId: doc.id,
           storeInfo: storeData['storeInfo'],
+          storeStatus: storeData['storeStatus'],
         } as storeData;
       });
       console.log('Store catch: ', store);
@@ -208,6 +214,7 @@ export class StoreService {
         return {
           storeId: store.id,
           storeInfo: storeData['storeInfo'],
+          storeStatus: storeData['storeStatus'],
         } as storeData;
       });
       console.log('Store catch: ', store);
@@ -393,13 +400,27 @@ export class StoreService {
    * @param storeData
    * Funcion para actualizar tienda.
    */
-  async updateStore(storeId: string, storeData: storeInfo): Promise<void> {
+  async updateStore(storeId: string, storeInfo: storeInfo): Promise<void> {
     try {
       const storeRef = doc(this.FIREBASE_DB, 'stores', storeId);
-      await updateDoc(storeRef, { storeData });
+      await updateDoc(storeRef, { storeInfo });
       console.log('✅ Store updated:', storeId);
     } catch (error) {
       console.error('❌ Error updating store:', error);
+      throw error;
+    }
+  }
+
+  async updateStoreStatus(
+    storeId: string,
+    storeStatus: storeStatus
+  ): Promise<void> {
+    try {
+      const storeRef = doc(this.FIREBASE_DB, 'stores', storeId);
+      await updateDoc(storeRef, { storeStatus });
+      console.log('✅ Store updated:', storeId);
+    } catch (error) {
+      console.error('❌ Error updating store status:', error);
       throw error;
     }
   }

@@ -5,7 +5,12 @@ export interface storeInfo {
   categories: string[];
 }
 
+export interface storeStatus {
+  statusCondition: boolean;
+}
+
 export interface storeData {
   storeId: string;
   storeInfo: storeInfo;
+  storeStatus: storeStatus;
 }

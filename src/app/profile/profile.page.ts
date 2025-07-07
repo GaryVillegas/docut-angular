@@ -32,6 +32,9 @@ export class ProfilePage implements OnInit {
       categories: [],
       userUID: '',
     },
+    storeStatus: {
+      statusCondition: false,
+    },
   };
 
   isClient = true;

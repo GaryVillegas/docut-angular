@@ -36,6 +36,10 @@ export class StorePage implements OnInit {
     try {
       const result = await this.storeServ.getUserStore(user.uid);
       this.storeData = result;
+      this.toggleLabel = this.storeData?.storeStatus.statusCondition
+        ? 'Tienda Abierta'
+        : 'Tienda Cerrada';
+      this.isLoading = false;
       this.isLoading = false;
     } catch (error) {
       console.log('error al buscar tienda: ', error);
@@ -72,7 +76,7 @@ export class StorePage implements OnInit {
   isAlertDeleteOpen = false;
   setAlertDeleteOpen(isOpen: boolean) {
     this.isAlertDeleteOpen = isOpen;
-    console.log(isOpen);
+    // console.log(isOpen);
   }
 
   public alertDeleteButtons = [
@@ -116,7 +120,6 @@ export class StorePage implements OnInit {
 
   categories = [
     'Barbería',
-    'Canina',
     'Spa',
     'Salón de Belleza',
     'Peluquería',
@@ -152,8 +155,35 @@ export class StorePage implements OnInit {
       this.isLoading = false;
       this.setModalSettingsOpen(false);
     } catch (erro) {
-      console.error('❌ Error eliminar tienda:', erro);
+      console.error('❌ Error actualizando tienda:', erro);
       this.showAlert('❌ Error al actualizar tienda');
     }
+  }
+
+  async updateStoreStatus() {
+    if (!this.storeData) return;
+    try {
+      await this.storeServ.updateStoreStatus(
+        this.storeData.storeId,
+        this.storeData.storeStatus
+      );
+      this.isLoading = false;
+    } catch (erro) {
+      console.error('❌ Error actualizando estado de tienda:', erro);
+      this.showAlert('❌ Error al actualizar tienda');
+    }
+  }
+
+  //isOpenStore Toggle
+  toggleLabel: string = '';
+
+  onToggleChange() {
+    if (!this.storeData) return;
+    // Actualiza el label según el nuevo estado
+    this.toggleLabel = this.storeData.storeStatus.statusCondition
+      ? 'Tienda Abierta'
+      : 'Tienda Cerrada';
+    // Llama a la función para actualizar en Firebase
+    this.updateStoreStatus();
   }
 }

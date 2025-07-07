@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { StoreService } from '../store.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { storeInfo } from '../types/store.type';
+import { storeInfo, storeStatus } from '../types/store.type';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
@@ -24,6 +24,10 @@ export class CreateStorePage {
     bussinessName: '',
     direction: '',
     categories: [],
+  };
+
+  storeStatus: storeStatus = {
+    statusCondition: false,
   };
 
   categories = [
@@ -69,6 +73,10 @@ export class CreateStorePage {
     this.currentSlideIndex--;
   }
 
+  cancel() {
+    this.router.navigate(['/tabs/home']);
+  }
+
   async handleSubmit() {
     const user = await this.auth.currentUser;
     if (!user) {
@@ -84,18 +92,21 @@ export class CreateStorePage {
       this.storeInfo.userUID = user.uid;
 
       // Crea la tienda (elimina la condición innecesaria)
-      await this.storeServ.createStore(user.uid, this.storeInfo);
+      await this.storeServ.createStore(
+        user.uid,
+        this.storeInfo,
+        this.storeStatus
+      );
 
       this.showToast('Éxito', 'Tienda creada correctamente.');
-      this.router.navigate(['/tabs/home']);
+      this.nextSlide();
+      setTimeout(() => {
+        this.router.navigate(['/tabs/home']);
+      }, 1500);
     } catch (error) {
       console.error('Error al crear la tienda:', error);
       this.showAlert('Hubo un error al crear la tienda: ' + error);
     }
-  }
-
-  cancel() {
-    this.router.navigate(['/register']);
   }
 
   async showToast(header: string, message: string) {

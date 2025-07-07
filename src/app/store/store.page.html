@@ -10,6 +10,7 @@
     <p>Cargando servicios...</p>
   </div>
   }@else {
+
   <ion-list [inset]="true">
     <ion-list-header>
       <ion-label>{{storeData?.storeInfo?.bussinessName}}</ion-label>
@@ -28,6 +29,21 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+  </ion-list>
+
+  <ion-list [inset]="true" lines="none">
+    <ion-list-header>
+      <ion-label> Estado de tienda </ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-label>
+        <ion-toggle
+          [(ngModel)]="storeData!.storeStatus!.statusCondition"
+          (ionChange)="onToggleChange()"
+          >{{ toggleLabel }}</ion-toggle
+        >
+      </ion-label>
+    </ion-item>
   </ion-list>
 
   <ion-list [inset]="true">
