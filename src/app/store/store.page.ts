@@ -168,6 +168,7 @@ export class StorePage implements OnInit {
         this.storeData.storeStatus
       );
       this.isLoading = false;
+      this.storeServ.shouldReloadStores = true;
     } catch (erro) {
       console.error('❌ Error actualizando estado de tienda:', erro);
       this.showAlert('❌ Error al actualizar tienda');

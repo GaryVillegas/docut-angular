@@ -22,6 +22,7 @@ import { date, dateData } from './types/date.type';
 })
 export class StoreService {
   constructor(private FIREBASE_DB: Firestore) {}
+  public shouldReloadStores = false;
 
   //all create Functions
 
@@ -230,13 +231,17 @@ export class StoreService {
    */
   async getAllStores(): Promise<storeData[]> {
     try {
-      const storeRef = collection(this.FIREBASE_DB, 'stores');
-      const storeSnapshot = await getDocs(storeRef);
+      const storeQuery = query(
+        collection(this.FIREBASE_DB, 'stores'),
+        where('storeStatus.statusCondition', '==', true)
+      );
+      const storeSnapshot = await getDocs(storeQuery);
       const stores = storeSnapshot.docs.map((store) => {
-        const storeData = store.data();
+        const storeInfo = store.data();
         return {
           storeId: store.id,
-          storeInfo: storeData['storeInfo'],
+          storeInfo: storeInfo['storeInfo'],
+          storeStatus: storeInfo['storeStatus'],
         } as storeData;
       });
       console.log('Stores catch: ', stores);

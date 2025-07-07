@@ -35,6 +35,13 @@ export class HomePage implements OnInit {
     await this.loadDate(user.uid);
   }
 
+  async ionViewWillEnter() {
+    if (this.storeServ.shouldReloadStores) {
+      await this.loadStores();
+      this.storeServ.shouldReloadStores = false;
+    }
+  }
+
   //Store Modal View
   isModalStore = false;
   storeSelected: string | null = null;
