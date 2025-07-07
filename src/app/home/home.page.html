@@ -4,7 +4,6 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" color="light">
-  <ion-searchbar animated="true" placeholder="Buscar tienda"></ion-searchbar>
   @if (isLoading){
   <div class="ion-text-center ion-padding">
     <ion-spinner color="tertiary"></ion-spinner>
@@ -36,6 +35,21 @@
         <p>Sin citas pronosticadas. 😉</p>
       </ion-card>
       }
+    </ion-row>
+  </ion-grid>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h2 class="title">Categorias</h2>
+        <div class="scroll-container">
+          <div class="scroll-item" *ngFor="let category of categories">
+            <div class="icon-container">
+              <ion-icon name="grid-outline"></ion-icon>
+            </div>
+            <p>{{category}}</p>
+          </div>
+        </div>
+      </ion-col>
     </ion-row>
   </ion-grid>
   <ion-grid>

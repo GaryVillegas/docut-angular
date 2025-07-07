@@ -18,6 +18,16 @@ export class HomePage implements OnInit {
   serviceStore: serviceData[] = [];
   cita: dateData | null = null;
   serviceCitaName: string | null = null;
+  categories = [
+    'Barbería',
+    'Canina',
+    'Spa',
+    'Salón de Belleza',
+    'Peluquería',
+    'Manicure',
+    'Pedicure',
+    'Depilación',
+  ];
 
   isLoading = true;
 

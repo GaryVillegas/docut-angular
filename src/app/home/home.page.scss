@@ -34,3 +34,46 @@
   line-height: 1.4em;
   max-height: 2.8em;
 }
+
+.scroll-container {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-item {
+  min-width: 80px;
+  height: 80px;
+  margin-right: 10px;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Crear un contenedor circular para el icono */
+.scroll-item .icon-container {
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-item ion-icon {
+  font-size: 24px;
+  color: #333;
+}
+
+.scroll-item p {
+  margin-top: 8px;
+  font-size: 14px;
+  text-align: center;
+}
