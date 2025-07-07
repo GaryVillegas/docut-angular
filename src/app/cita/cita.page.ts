@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StoreService } from '../store.service';
 import { ToastController } from '@ionic/angular';
-import { tap } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { date } from '../types/date.type';
 import {

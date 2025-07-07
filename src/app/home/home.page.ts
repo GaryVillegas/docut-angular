@@ -128,6 +128,10 @@ export class HomePage implements OnInit {
     this.route.navigate(['/cita'], { queryParams: { id: serviceId } });
   }
 
+  fetchCategory(name: string) {
+    this.route.navigate(['/category'], { queryParams: { name: name } });
+  }
+
   async presentToast(header: string, message: string, color: string) {
     const toast = await this.toastController.create({
       header: header,

@@ -1,0 +1,14 @@
+ion-grid {
+  ion-row {
+    ion-col {
+      ion-back-button {
+        --background: #673ab7;
+        --color: white;
+        --border-radius: 40px;
+        width: 40px;
+        height: 40px;
+        margin-top: 10px;
+      }
+    }
+  }
+}

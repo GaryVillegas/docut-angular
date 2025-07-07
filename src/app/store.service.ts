@@ -372,6 +372,34 @@ export class StoreService {
     }
   }
 
+  /**
+   * @param nombre
+   * @returns tiendas con el nombre de categoria
+   */
+  async getStoreByCategory(nombre: string): Promise<storeData[] | undefined> {
+    try {
+      const storeQuery = query(
+        collection(this.FIREBASE_DB, 'stores'),
+        where('storeStatus.statusCondition', '==', true),
+        where('storeInfo.categories', 'array-contains', nombre)
+      );
+      const storeSnapshot = await getDocs(storeQuery);
+      const stores = storeSnapshot.docs.map((store) => {
+        const storeInfo = store.data();
+        return {
+          storeId: store.id,
+          storeInfo: storeInfo['storeInfo'],
+          storeStatus: storeInfo['storeStatus'],
+        } as storeData;
+      });
+      console.log('Stores category catch: ', stores);
+      return stores;
+    } catch (error) {
+      console.log('Error catching store: ', error);
+      throw error;
+    }
+  }
+
   //Updatings
 
   /**

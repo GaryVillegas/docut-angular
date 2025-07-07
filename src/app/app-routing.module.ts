@@ -68,7 +68,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./cita/cita.module').then((m) => m.CitaPageModule),
     canActivate: [AuthGuard],
+  },  {
+    path: 'category',
+    loadChildren: () => import('./category/category.module').then( m => m.CategoryPageModule)
   },
+
 ];
 
 @NgModule({
