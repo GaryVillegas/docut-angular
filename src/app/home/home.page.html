@@ -18,20 +18,30 @@
     </ion-row>
     <ion-row>
       @if(cita){
-      <ion-card color="tertiary" class="appointment-card">
-        <div>
-          <h3>
-            <ion-icon name="calendar-clear-outline"></ion-icon>
-            {{serviceCitaName}}
-          </h3>
-          <p>
-            {{cita.dateData.nombreUsuario}} {{cita.dateData.apellidoUsuario}}
-          </p>
-          <p>Hora Cita: {{cita.dateData.horaSeleccionada}}</p>
+      <div class="service-card">
+        <div class="service-card__header">
+          <div class="service-card__icon"></div>
+          <div class="service-card__title">
+            <h3>{{serviceCitaName}}</h3>
+            <p>
+              {{cita.dateData.nombreUsuario}} {{cita.dateData.apellidoUsuario}}
+            </p>
+          </div>
         </div>
-      </ion-card>
+
+        <div class="service-card__footer">
+          <div class="service-card__time">
+            {{cita.dateData.horaSeleccionada}}
+          </div>
+          <div
+            class="service-card__menu"
+            id="option-popover-button"
+            (click)="openServiceOptions($event, cita.dateId)"
+          ></div>
+        </div>
+      </div>
       } @else {
-      <ion-card color="tertiary" class="appointment-card">
+      <ion-card class="service-card">
         <p>Sin citas pronosticadas. 😉</p>
       </ion-card>
       }
@@ -149,4 +159,31 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <!-- optionPopOver -->
+  <ion-popover
+    #optionsPopover
+    [isOpen]="isOptionsPopoverOpen"
+    (didDismiss)="isOptionsPopoverOpen = false"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list lines="none">
+          <ion-item button detail="false" (click)="updateCurrentDate()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Cancelar
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+
+  <ion-alert
+    [isOpen]="isAlertServiceOpen"
+    header="Cancelar Cita"
+    message="Al cancelar la cita, se perdera la cita. ¿esta seguro?"
+    [buttons]="alertServiceButtons"
+    (didDismiss)="setAlertServiceOpen(false)"
+  >
+  </ion-alert>
 </ion-content>

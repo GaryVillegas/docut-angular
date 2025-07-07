@@ -450,6 +450,10 @@ export class StoreService {
     }
   }
 
+  /**
+   * @param storeId
+   * @param storeStatus
+   */
   async updateStoreStatus(
     storeId: string,
     storeStatus: storeStatus
@@ -460,6 +464,20 @@ export class StoreService {
       console.log('✅ Store updated:', storeId);
     } catch (error) {
       console.error('❌ Error updating store status:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param dateId
+   */
+  async updateDateStatus(dateId: string, status: string): Promise<void> {
+    try {
+      const dateRef = doc(this.FIREBASE_DB, 'cita', dateId);
+      await updateDoc(dateRef, { 'cita.status': status });
+      console.log('Date Updated: ', dateId);
+    } catch (error) {
+      console.error('❌ Error updating date status:', error);
       throw error;
     }
   }

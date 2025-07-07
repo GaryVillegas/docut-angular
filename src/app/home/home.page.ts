@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { StoreService } from '../store.service';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { serviceData } from '../types/service.type';
 import { storeData } from '../types/store.type';
 import { dateData } from '../types/date.type';
+import type { IonPopover } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-home',
@@ -130,6 +131,62 @@ export class HomePage implements OnInit {
 
   fetchCategory(name: string) {
     this.route.navigate(['/category'], { queryParams: { name: name } });
+  }
+
+  @ViewChild('optionsPopover') optionsPopover!: IonPopover;
+  isOptionsPopoverOpen = false;
+  dateId: string | null = null;
+
+  openServiceOptions(event: Event, date: string) {
+    this.dateId = date;
+    this.optionsPopover.event = event;
+    this.isOptionsPopoverOpen = true;
+    console.log('Abrir opciones para servicio:', date);
+  }
+
+  //delete service
+  isAlertServiceOpen = false;
+  setAlertServiceOpen(isOpen: boolean) {
+    this.isAlertServiceOpen = isOpen;
+  }
+
+  async updateDateStatus() {
+    if (this.dateId) {
+      try {
+        await this.storeServ.updateDateStatus(this.dateId, 'cancelada');
+        this.setAlertServiceOpen(false);
+        this.isOptionsPopoverOpen = false;
+        const user = await this.auth.currentUser;
+        if (!user) return;
+        this.loadDate(user.uid);
+      } catch (error) {
+        console.error('Error al eliminar el servicio:', error);
+        this.presentToast('Error', 'Error al buscar una la cita.', 'danger');
+      }
+    }
+  }
+
+  public alertServiceButtons = [
+    {
+      text: 'No',
+      role: 'cancel',
+      handler: () => {
+        this.setAlertServiceOpen(false);
+      },
+    },
+    {
+      text: 'Si',
+      role: 'confirm',
+      handler: () => {
+        this.updateDateStatus();
+      },
+    },
+  ];
+
+  updateCurrentDate() {
+    if (this.dateId) {
+      this.isAlertServiceOpen = true;
+    }
   }
 
   async presentToast(header: string, message: string, color: string) {
