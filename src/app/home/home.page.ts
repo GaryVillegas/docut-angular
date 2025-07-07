@@ -99,13 +99,14 @@ export class HomePage implements OnInit {
   private async loadDate(userUID: string) {
     try {
       const result = await this.storeServ.getUserDate(userUID);
-      this.cita = result;
+      if (!result) return;
       if (result) {
         const service = await this.storeServ.getServiceName(
           result.dateData.idServicio
         );
         this.serviceCitaName = service;
       }
+      this.cita = result;
     } catch (error) {
       this.presentToast('Error', 'Error al buscar una la cita.', 'danger');
     }

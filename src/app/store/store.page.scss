@@ -30,3 +30,10 @@ ion-modal {
     }
   }
 }
+
+ion-toggle {
+  --track-background: #ddd;
+  --track-background-checked: #673ab7;
+  --handle-background: #eb7769;
+  --handle-background-checked: #ddd;
+}

@@ -262,7 +262,7 @@ export class StoreService {
    * @param userUID
    * @returns cita de usuario con solo el userUID.
    */
-  async getUserDate(userUID: string): Promise<dateData> {
+  async getUserDate(userUID: string): Promise<dateData | undefined> {
     try {
       const dateRef = collection(this.FIREBASE_DB, 'cita');
       const fechaHoy = new Date().toISOString().split('T')[0];
@@ -282,8 +282,22 @@ export class StoreService {
           dateData: dateData['cita'],
         } as dateData;
       });
-      console.log('cita obtenida: ', date);
-      return date[0];
+      // Agregar la regla: si la hora ya pasó, no regresar la cita
+      if (date[0]) {
+        const ahora = new Date();
+        const citaHora = new Date(
+          `${fechaHoy}T${date[0].dateData.horaSeleccionada}:00`
+        );
+        if (citaHora > ahora) {
+          console.log('cita obtenida: ', date);
+          return date[0];
+        } else {
+          console.log('La cita ya pasó.');
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
     } catch (error) {
       console.log('Error obteniendo cita: ', error);
       throw error;
