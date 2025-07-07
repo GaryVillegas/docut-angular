@@ -262,17 +262,15 @@ export class StoreService {
    * @param userUID
    * @returns cita de usuario con solo el userUID.
    */
-  async getUserDate(userUID: string): Promise<dateData | undefined> {
+  async getUserDate(userUID: string): Promise<dateData> {
     try {
       const dateRef = collection(this.FIREBASE_DB, 'cita');
       const fechaHoy = new Date().toISOString().split('T')[0];
-      console.log(fechaHoy);
       const dateQuery = query(
         dateRef,
         where('cita.idUsuario', '==', userUID),
         where('cita.fechaSeleccionada', '==', fechaHoy),
-        where('cita.status', '==', 'activa'),
-        limit(1)
+        where('cita.status', '==', 'activa')
       );
       const dateSnapshot = await getDocs(dateQuery);
       const date = dateSnapshot.docs.map((doc) => {
@@ -282,22 +280,8 @@ export class StoreService {
           dateData: dateData['cita'],
         } as dateData;
       });
-      // Agregar la regla: si la hora ya pasó, no regresar la cita
-      if (date[0]) {
-        const ahora = new Date();
-        const citaHora = new Date(
-          `${fechaHoy}T${date[0].dateData.horaSeleccionada}:00`
-        );
-        if (citaHora > ahora) {
-          console.log('cita obtenida: ', date);
-          return date[0];
-        } else {
-          console.log('La cita ya pasó.');
-          return undefined;
-        }
-      } else {
-        return undefined;
-      }
+      console.log('cita obtenida: ', date);
+      return date[0];
     } catch (error) {
       console.log('Error obteniendo cita: ', error);
       throw error;
