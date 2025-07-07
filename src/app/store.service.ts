@@ -23,6 +23,7 @@ import { date, dateData } from './types/date.type';
 export class StoreService {
   constructor(private FIREBASE_DB: Firestore) {}
   public shouldReloadStores = false;
+  public shouldReloadDate = false;
 
   //all create Functions
 
@@ -99,6 +100,11 @@ export class StoreService {
     try {
       if (!cita) {
         throw new Error('Los datos son requeridos.');
+      }
+
+      const citaExistente = await this.getUserDate(cita.idUsuario);
+      if (citaExistente) {
+        throw new Error('Ya tienes una cita activa por hoy.');
       }
 
       const id = `${cita.idUsuario}-${Date.now()}`;
@@ -260,10 +266,12 @@ export class StoreService {
     try {
       const dateRef = collection(this.FIREBASE_DB, 'cita');
       const fechaHoy = new Date().toISOString().split('T')[0];
+      console.log(fechaHoy);
       const dateQuery = query(
         dateRef,
         where('cita.idUsuario', '==', userUID),
         where('cita.fechaSeleccionada', '==', fechaHoy),
+        where('cita.status', '==', 'activa'),
         limit(1)
       );
       const dateSnapshot = await getDocs(dateQuery);

@@ -36,9 +36,15 @@ export class HomePage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    const user = await this.auth.currentUser;
+    if (!user) return;
     if (this.storeServ.shouldReloadStores) {
       await this.loadStores();
       this.storeServ.shouldReloadStores = false;
+    }
+    if (this.storeServ.shouldReloadDate) {
+      await this.loadDate(user.uid);
+      this.storeServ.shouldReloadDate = false;
     }
   }
 

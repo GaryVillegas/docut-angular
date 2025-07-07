@@ -40,7 +40,6 @@ export class StorePage implements OnInit {
         ? 'Tienda Abierta'
         : 'Tienda Cerrada';
       this.isLoading = false;
-      this.isLoading = false;
     } catch (error) {
       console.log('error al buscar tienda: ', error);
       this.showAlert('Error al buscar su tienda.');

@@ -29,6 +29,7 @@ export class CitaPage implements OnInit {
     nombreUsuario: '',
     apellidoUsuario: '',
     idUsuario: '',
+    status: '',
   };
   newTransaction: TransactionRequest = {
     amount: 0,
@@ -101,9 +102,6 @@ export class CitaPage implements OnInit {
     this.currentSlide++;
   }
 
-  /**
-   * TODO: With all the data, need to create a transbank check
-   */
   async createDate() {
     const user = await this.auth.currentUser;
     if (
@@ -137,22 +135,24 @@ export class CitaPage implements OnInit {
     this.cita.idServicio = this.serviceId;
     this.cita.idNegocio = this.serviceData.serviceData.storeId;
     this.cita.idUsuario = user.uid;
+    //status date = cancelada, finalizada, en proceso o activa
+    this.cita.status = 'activa';
 
     // Aquí iría la lógica para guardar la cita en Firebase o donde sea necesario
     console.log('Datos de la cita listos para guardar:', this.cita);
     try {
       console.log(this.cita);
       await this.storeServ.createDate(this.cita);
+      this.storeServ.shouldReloadDate = true;
       setTimeout(() => {
         this.route.navigate(['/tabs/home']);
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.log('error creando cita: ', error);
-      this.presentToast(
-        'Error',
-        'Hubo un error al crear la cita. Por favor, inténtelo más tarde.',
-        'danger'
-      );
+      this.presentToast('Error', `${error}`, 'danger');
+      if (error.code === 'Ya tienes una cita activa por hoy.') {
+        this.route.navigate(['/tabs/home']);
+      }
     }
   }
 
@@ -208,9 +208,9 @@ export class CitaPage implements OnInit {
       text: 'Presencial',
       role: 'cancel',
       handler: () => {
-        this.nextSlide();
+        this.createDate();
         setTimeout(() => {
-          this.createDate();
+          this.nextSlide();
         }, 2000);
       },
     },

@@ -6,6 +6,7 @@ export interface date {
   nombreUsuario: string;
   apellidoUsuario: string;
   idUsuario: string;
+  status: string;
 }
 
 export interface dateData {
