@@ -16,7 +16,7 @@ import { userInfo, userData } from './types/user.type';
 import { storeData, storeInfo, storeStatus } from './types/store.type';
 import { service, serviceData } from './types/service.type';
 import { date, dateData } from './types/date.type';
-import { stockInfo } from './types/stock.type';
+import { stockData, stockInfo } from './types/stock.type';
 
 @Injectable({
   providedIn: 'root',
@@ -407,6 +407,32 @@ export class StoreService {
     } catch (error) {
       console.log('Error catching store: ', error);
       throw error;
+    }
+  }
+
+  async getStock(storeId: string): Promise<stockData[]> {
+    try {
+      if (!storeId) {
+        return [];
+      }
+
+      const stockQuery = query(
+        collection(this.FIREBASE_DB, 'stock'),
+        where('stockInfo.storeId', '==', storeId)
+      );
+      const stockSnapshot = await getDocs(stockQuery);
+      const stocks = stockSnapshot.docs.map((stock) => {
+        const stockInfo = stock.data();
+        return {
+          id: stock.id,
+          stockInfo: stockInfo['stockInfo'],
+        } as stockData;
+      });
+      console.log('Stock catch: ', stocks);
+      return stocks;
+    } catch (error) {
+      console.log('Error catching stock: ', error);
+      return []; // Devuelve array vacío en lugar de lanzar error
     }
   }
 

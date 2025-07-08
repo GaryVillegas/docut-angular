@@ -12,7 +12,7 @@ import { IonPopover, ToastController } from '@ionic/angular';
 })
 export class StockPage implements OnInit {
   storeId: string | null = null;
-  stockData: stockData | null = null;
+  stockData: stockData[] = [];
   isLoading = true;
   stockInfo: stockInfo = {
     nombre: '',
@@ -27,9 +27,11 @@ export class StockPage implements OnInit {
     private toastController: ToastController
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.storeId = this.activatedRoute.snapshot.queryParamMap.get('id');
-    this.isLoading = false;
+    if (this.storeId) {
+      await this.loadStock(this.storeId);
+    }
   }
 
   //create modal
@@ -46,7 +48,13 @@ export class StockPage implements OnInit {
 
   //from options
   private resetForm() {
-    this.storeId = null;
+    // Resetear solo el formulario, no el storeId
+    this.stockInfo = {
+      nombre: '',
+      descripcion: '',
+      cantidad: 0,
+      storeId: this.storeId || '', // Mantener el storeId
+    };
   }
 
   //popover
@@ -76,6 +84,23 @@ export class StockPage implements OnInit {
     } catch (error) {
       console.error('Error al crear el producto: ', error);
       this.presentToast('Error', 'Error al crear el producto', 'danger');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async loadStock(storeId: string) {
+    try {
+      if (!storeId) return;
+
+      const stocks = await this.storeServ.getStock(storeId);
+      this.stockData = stocks; // Siempre asignar, ya que getStock siempre devuelve un array
+
+      console.log('Stock encontrado:', this.stockData);
+    } catch (error) {
+      console.log('error obteniendo stock: ', error);
+      this.presentToast('Error', 'error obteniendo stock', 'danger');
+      this.stockData = []; // Asegurar que sea un array vacío en caso de error
     } finally {
       this.isLoading = false;
     }
