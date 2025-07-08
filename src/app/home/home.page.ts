@@ -274,14 +274,21 @@ export class HomePage implements OnInit {
   }
 
   storeDates: dateData[] = [];
+  serviceNames: { [key: string]: string | null } = {};
 
   async loadStoreDates() {
     const selectedStore = this.getSelectedStore();
-    console.log(selectedStore);
     if (selectedStore?.storeId) {
       try {
         const result = await this.storeServ.getStoreDate(selectedStore.storeId);
-        this.storeDates = result || []; // Corregir la lógica aquí
+        this.storeDates = result || [];
+
+        // Obtener nombres de servicios
+        for (let cita of this.storeDates) {
+          const serviceId = cita.dateData.idServicio;
+          const serviceName = await this.storeServ.getServiceName(serviceId);
+          this.serviceNames[serviceId] = serviceName;
+        }
       } catch (error) {
         this.storeDates = [];
         this.presentToast(
@@ -292,6 +299,34 @@ export class HomePage implements OnInit {
       }
     } else {
       this.storeDates = [];
+    }
+  }
+
+  //client dates options
+  @ViewChild('dateOptionPopover') popover!: IonPopover;
+  isDateOptionOpen = false;
+  currentDate: any = null;
+
+  openDateOption(event: Event, date: any) {
+    this.currentDate = date;
+    this.popover.event = event;
+    this.isDateOptionOpen = true;
+  }
+
+  //update client date
+  async updateClientDate(status: string) {
+    if (this.currentDate) {
+      try {
+        await this.storeServ.updateDateStatus(this.currentDate.dateId, status);
+        const user = await this.auth.currentUser;
+        if (!user) return;
+        this.loadStoreDates();
+        this.isDateOptionOpen = false;
+        this.isOptionsPopoverOpen = false;
+      } catch (error) {
+        console.error('Error al eliminar el servicio:', error);
+        this.presentToast('Error', 'Error al buscar una la cita.', 'danger');
+      }
     }
   }
 

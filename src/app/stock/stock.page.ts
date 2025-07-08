@@ -81,6 +81,9 @@ export class StockPage implements OnInit {
       this.stockInfo.storeId = this.storeId;
       await this.storeServ.createProduct(this.storeId, this.stockInfo);
       this.setOpenModal(false);
+      if (this.storeId) {
+        await this.loadStock(this.storeId);
+      }
     } catch (error) {
       console.error('Error al crear el producto: ', error);
       this.presentToast('Error', 'Error al crear el producto', 'danger');

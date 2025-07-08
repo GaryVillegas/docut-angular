@@ -141,3 +141,35 @@
 ion-alert {
   border-radius: 10px;
 }
+
+.cards-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.appointment-card {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+.client-name {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.service-name {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.time {
+  font-size: 14px;
+  font-weight: bold;
+}

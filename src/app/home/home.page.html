@@ -50,6 +50,28 @@
   <ion-grid>
     <ion-row>
       <ion-col>
+        <h2 class="title">Citas de Tienda</h2>
+      </ion-col>
+    </ion-row>
+    <div class="cards-container" *ngFor="let citas of storeDates">
+      @if(citas){
+      <div class="appointment-card" (click)="openDateOption($event, citas)">
+        <div class="client-name">
+          {{citas.dateData.nombreUsuario}} {{citas.dateData.apellidoUsuario}}
+        </div>
+        <div class="service-name">
+          Servicio: {{ serviceNames[citas.dateData.idServicio] }}
+        </div>
+        <div class="time">⏰ {{citas.dateData.horaSeleccionada}}</div>
+      </div>
+      } @else{
+      <div class="appointment-card">No tienes citas</div>
+      }
+    </div>
+  </ion-grid>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
         <h2 class="title">Categorias</h2>
         <div class="scroll-container">
           <div
@@ -186,4 +208,27 @@
     (didDismiss)="setAlertServiceOpen(false)"
   >
   </ion-alert>
+
+  <!--dateOptionPopover-->
+  <ion-popover
+    #dateOptionPopover
+    [isOpen]="isDateOptionOpen"
+    (didDismiss)="isDateOptionOpen = false"
+    side="end"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list lines="none">
+          <ion-item (click)="updateClientDate('cancelada')">Cancelar</ion-item>
+          <ion-item (click)="updateClientDate('En Proceso')"
+            >En Proceso</ion-item
+          >
+          <ion-item (click)="updateClientDate('Finalizada')"
+            >Finalizar</ion-item
+          >
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+  <!--------------------->
 </ion-content>
