@@ -72,6 +72,12 @@ export class StorePage implements OnInit {
     this.route.navigate(['store-service']);
   }
 
+  goToStock() {
+    this.route.navigate(['/stock'], {
+      queryParams: { id: this.storeData?.storeId },
+    });
+  }
+
   isAlertDeleteOpen = false;
   setAlertDeleteOpen(isOpen: boolean) {
     this.isAlertDeleteOpen = isOpen;

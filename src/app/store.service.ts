@@ -16,6 +16,7 @@ import { userInfo, userData } from './types/user.type';
 import { storeData, storeInfo, storeStatus } from './types/store.type';
 import { service, serviceData } from './types/service.type';
 import { date, dateData } from './types/date.type';
+import { stockInfo } from './types/stock.type';
 
 @Injectable({
   providedIn: 'root',
@@ -114,6 +115,31 @@ export class StoreService {
       console.log('cita creada.');
     } catch (error) {
       console.error('Error al crear la cita: ', error);
+      throw error;
+    }
+  }
+
+  /**
+   * @param storeID
+   * @param stockInfo
+   */
+  async createProduct(storeID: string, stockInfo: stockInfo): Promise<void> {
+    try {
+      //Verificar falda de informacion
+      if (!stockInfo) {
+        throw new Error('Los datos son requeridos.');
+      }
+      //Crear id de objeto con id tienda y fecha
+      const id = `${storeID}-${Date.now()}`;
+      //Crear producto en firestore
+      await setDoc(doc(this.FIREBASE_DB, 'stock', id), {
+        stockInfo: stockInfo,
+      });
+      //Validacion de creacion
+      console.log('Producto Creado!');
+    } catch (error) {
+      //Manejo de errores
+      console.error('Error al crear el producto: ', error);
       throw error;
     }
   }
