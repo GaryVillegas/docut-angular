@@ -44,6 +44,7 @@ export class HomePage implements OnInit {
     if (!user) return;
     await this.loadStores();
     await this.loadDate(user.uid);
+    await this.automaticCancel();
   }
 
   async ionViewWillEnter() {
@@ -118,6 +119,7 @@ export class HomePage implements OnInit {
         this.serviceCitaName = service;
       }
       this.cita = result;
+      await this.automaticCancel();
     } catch (error) {
       this.presentToast('Error', 'Error al buscar una la cita.', 'danger');
     }
@@ -154,11 +156,11 @@ export class HomePage implements OnInit {
     if (this.dateId) {
       try {
         await this.storeServ.updateDateStatus(this.dateId, 'cancelada');
-        this.setAlertServiceOpen(false);
-        this.isOptionsPopoverOpen = false;
         const user = await this.auth.currentUser;
         if (!user) return;
         this.loadDate(user.uid);
+        this.setAlertServiceOpen(false);
+        this.isOptionsPopoverOpen = false;
       } catch (error) {
         console.error('Error al eliminar el servicio:', error);
         this.presentToast('Error', 'Error al buscar una la cita.', 'danger');
@@ -186,6 +188,62 @@ export class HomePage implements OnInit {
   updateCurrentDate() {
     if (this.dateId) {
       this.isAlertServiceOpen = true;
+    }
+  }
+
+  async automaticCancel() {
+    if (this.dateId) {
+      if (!this.cita) return;
+      const fechaCita = this.cita?.dateData.fechaSeleccionada;
+      const horaCita = this.cita?.dateData.horaSeleccionada;
+
+      try {
+        //Convertir fecha u hora actual a objetos date
+        const ahora = new Date();
+        const fechaHoy = ahora.toISOString().split('T')[0];
+
+        //verificar si la cita es de un dia anterior
+        if (fechaCita < fechaHoy) {
+          await this.marcarCitaVencida();
+          return;
+        }
+
+        //Siu es el mismo dia, comprar hora
+        if (fechaCita === fechaHoy) {
+          const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+          const [horasCita, minutosCita] = horaCita.split(':').map(Number);
+          const minutosTotalCita = Number(horaCita) * 60 + minutosCita;
+
+          //Verificar si la hora de la cita ya paso
+          if (minutosTotalCita < horaActual) {
+            await this.marcarCitaVencida();
+            return;
+          }
+        }
+
+        console.log('La cita sigue activa');
+      } catch (error) {
+        console.error('Error al verificar el estado de la cita: ', error);
+      }
+    }
+  }
+
+  private async marcarCitaVencida(): Promise<void> {
+    if (this.dateId) {
+      try {
+        await this.storeServ.updateDateStatus(this.dateId, 'cancelada');
+        const user = await this.auth.currentUser;
+        if (!user) return;
+        this.loadDate(user.uid);
+        this.presentToast(
+          'DoCut',
+          'Su cita ha vencido y ha sido cancelada automáticamente',
+          'warning'
+        );
+      } catch (error) {
+        console.error('Error al tratar de editar la cita: ', error);
+        this.presentToast('Error', 'Error al actualizar la cita.', 'danger');
+      }
     }
   }
 
