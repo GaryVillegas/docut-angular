@@ -601,4 +601,14 @@ export class StoreService {
       throw error;
     }
   }
+
+  async deleteStock(stockId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(this.FIREBASE_DB, 'stock', stockId));
+      console.log('Stock eliminado: ', stockId);
+    } catch (error) {
+      console.error('Error al eliminar stock', error);
+      throw error;
+    }
+  }
 }

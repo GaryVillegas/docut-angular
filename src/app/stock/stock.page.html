@@ -31,7 +31,12 @@
 
     <div class="bottom-section">
       <div class="cost-badge">Cantidad: {{stock.stockInfo.cantidad}}</div>
-      <button class="menu-button" aria-label="Más opciones"></button>
+      <button
+        class="menu-button"
+        aria-label="Más opciones"
+        id="option-popover-button"
+        (click)="openStockOption($event, stock)"
+      ></button>
     </div>
   </div>
   }
@@ -110,4 +115,32 @@
     </ng-template>
   </ion-popover>
   <!------------------>
+  <!--optionPopover-->
+  <ion-popover
+    #optionsPopover
+    [isOpen]="isOptionOpen"
+    (didDismiss)="isOptionOpen = false"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list lines="none">
+          <ion-item (click)="deleteCurrentStock()"
+            ><ion-icon name="trash-outline" slot="start"></ion-icon
+            >Eliminar</ion-item
+          >
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+  <!----------------->
+  <!--Alert-->
+  <ion-alert
+    [isOpen]="isAlertServiceOpen"
+    header="Elminar Producto"
+    message="Al eliminar el producto se eliminara toda la información de este. ¿esta seguro?"
+    [buttons]="alertServiceButtons"
+    (didDismiss)="setAlertServiceOpen(false)"
+  >
+  </ion-alert>
+  <!--------->
 </ion-content>

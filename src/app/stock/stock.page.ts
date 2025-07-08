@@ -106,6 +106,59 @@ export class StockPage implements OnInit {
     }
   }
 
+  //option popover
+  @ViewChild('optionsPopover') optionsPopover!: IonPopover;
+  isOptionOpen = false;
+  currentStock: any = null;
+
+  openStockOption(event: Event, stock: any) {
+    this.currentStock = stock;
+    this.optionsPopover.event = event;
+    this.isOptionOpen = true;
+  }
+
+  //delete service
+  isAlertServiceOpen = false;
+  setAlertServiceOpen(isOpen: boolean) {
+    this.isAlertServiceOpen = isOpen;
+  }
+
+  public alertServiceButtons = [
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => {
+        this.setAlertServiceOpen(false);
+      },
+    },
+    {
+      text: 'Si',
+      role: 'confirm',
+      handler: () => {
+        this.deleteStock();
+      },
+    },
+  ];
+
+  async deleteStock() {
+    if (this.currentStock && this.currentStock.id && this.storeId) {
+      try {
+        await this.storeServ.deleteStock(this.currentStock.id);
+        this.isOptionOpen = false;
+        this.setAlertServiceOpen(false);
+        this.loadStock(this.storeId);
+      } catch (error) {
+        this.presentToast('Error', 'error al eliminar producto', 'danger');
+      }
+    }
+  }
+
+  deleteCurrentStock() {
+    if (this.currentStock) {
+      this.setAlertServiceOpen(true);
+    }
+  }
+
   //notification
   async presentToast(header: string, message: string, color: string) {
     const toast = await this.toastController.create({
