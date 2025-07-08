@@ -4,7 +4,6 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" color="light">
-  <ion-searchbar animated="true" placeholder="Buscar tienda"></ion-searchbar>
   @if (isLoading){
   <div class="ion-text-center ion-padding">
     <ion-spinner color="tertiary"></ion-spinner>
@@ -18,9 +17,75 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-card color="tertiary" class="appointment-card">
+      @if(cita){
+      <div class="service-card">
+        <div class="service-card__header">
+          <div class="service-card__icon"></div>
+          <div class="service-card__title">
+            <h3>{{serviceCitaName}}</h3>
+            <p>
+              {{cita.dateData.nombreUsuario}} {{cita.dateData.apellidoUsuario}}
+            </p>
+          </div>
+        </div>
+
+        <div class="service-card__footer">
+          <div class="service-card__time">
+            {{cita.dateData.horaSeleccionada}}
+          </div>
+          <div
+            class="service-card__menu"
+            id="option-popover-button"
+            (click)="openServiceOptions($event, cita.dateId)"
+          ></div>
+        </div>
+      </div>
+      } @else {
+      <ion-card class="service-card">
         <p>Sin citas pronosticadas. 😉</p>
       </ion-card>
+      }
+    </ion-row>
+  </ion-grid>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h2 class="title">Citas de Tienda</h2>
+      </ion-col>
+    </ion-row>
+    <div class="cards-container" *ngFor="let citas of storeDates">
+      @if(citas){
+      <div class="appointment-card" (click)="openDateOption($event, citas)">
+        <div class="client-name">
+          {{citas.dateData.nombreUsuario}} {{citas.dateData.apellidoUsuario}}
+        </div>
+        <div class="service-name">
+          Servicio: {{ serviceNames[citas.dateData.idServicio] }}
+        </div>
+        <div class="time">⏰ {{citas.dateData.horaSeleccionada}}</div>
+      </div>
+      } @else{
+      <div class="appointment-card">No tienes citas</div>
+      }
+    </div>
+  </ion-grid>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h2 class="title">Categorias</h2>
+        <div class="scroll-container">
+          <div
+            class="scroll-item"
+            *ngFor="let category of categories"
+            (click)="fetchCategory(category)"
+          >
+            <div class="icon-container">
+              <ion-icon name="grid-outline"></ion-icon>
+            </div>
+            <p>{{category}}</p>
+          </div>
+        </div>
+      </ion-col>
     </ion-row>
   </ion-grid>
   <ion-grid>
@@ -28,8 +93,8 @@
       <ion-col>
         <h2 class="title">Disponible</h2>
         <ion-card
+          (click)="setModalStore(true, store.storeId)"
           *ngFor="let store of stores"
-          (click)="setModalStore(true, store.documentId)"
         >
           <ion-card-header>
             <ion-card-title> {{store.storeInfo.bussinessName}} </ion-card-title>
@@ -91,8 +156,79 @@
           </ion-card>
         </div>
 
-        <!-- Modifica el modal de servicios para asegurarte de que se muestra correctamente -->
+        <ion-card
+          *ngFor="let services of serviceStore"
+          (click)="createDate(services.serviceId)"
+        >
+          <ion-card-header>
+            <ion-card-subtitle>
+              Tiempo Estimado: {{services.serviceData.tiempoEstimado}}, Costo:
+              ${{services.serviceData.precio}}
+            </ion-card-subtitle>
+            <ion-card-title>
+              {{services.serviceData.nombreServicio}}
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content class="descripcion-corta">
+            {{services.serviceData.descripcionServicio}}
+          </ion-card-content>
+        </ion-card>
+        <ion-card *ngIf="serviceStore.length === 0">
+          <ion-card-header>
+            <ion-card-title> Sin Servicios </ion-card-title>
+          </ion-card-header>
+        </ion-card>
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <!-- optionPopOver -->
+  <ion-popover
+    #optionsPopover
+    [isOpen]="isOptionsPopoverOpen"
+    (didDismiss)="isOptionsPopoverOpen = false"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list lines="none">
+          <ion-item button detail="false" (click)="updateCurrentDate()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Cancelar
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+
+  <ion-alert
+    [isOpen]="isAlertServiceOpen"
+    header="Cancelar Cita"
+    message="Al cancelar la cita, se perdera la cita. ¿esta seguro?"
+    [buttons]="alertServiceButtons"
+    (didDismiss)="setAlertServiceOpen(false)"
+  >
+  </ion-alert>
+
+  <!--dateOptionPopover-->
+  <ion-popover
+    #dateOptionPopover
+    [isOpen]="isDateOptionOpen"
+    (didDismiss)="isDateOptionOpen = false"
+    side="end"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list lines="none">
+          <ion-item (click)="updateClientDate('cancelada')">Cancelar</ion-item>
+          <ion-item (click)="updateClientDate('En Proceso')"
+            >En Proceso</ion-item
+          >
+          <ion-item (click)="updateClientDate('Finalizada')"
+            >Finalizar</ion-item
+          >
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+  <!--------------------->
 </ion-content>

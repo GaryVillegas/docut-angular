@@ -1,12 +1,16 @@
-<ion-header collapse="condense">
-  <ion-toolbar>
-    <ion-title size="default">Tus Servicios</ion-title>
-    <ion-buttons slot="start">
-      <ion-back-button default-href="/tabs/store"></ion-back-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-<ion-content [fullscreen]="true" color="light">
+<ion-content [fullscreen]="true" color="light" class="ion-padding">
+  <ion-grid [fixed]="true">
+    <ion-row>
+      <ion-col size="auto">
+        <ion-back-button default-href="/tabs/store" text="">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-back-button>
+      </ion-col>
+      <ion-col size="auto">
+        <h3>Tus Servicios</h3>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
   <ion-grid>
     <ion-col>
       <ion-button size="small" (click)="setOpenCreateModal(true)">
@@ -16,49 +20,30 @@
   </ion-grid>
 
   <!-- 🛠️ LISTA DE SERVICIOS - Solo corregida la sintaxis -->
-  <div *ngFor="let service of storeData.services">
-    <ion-card class="ion-padding">
-      <ion-card-header>
-        <ion-card-subtitle>
-          Tiempo estimado: {{service.serviceData.tiempoEstimado}} hr
-        </ion-card-subtitle>
-        <ion-card-title>{{service.serviceData.nombreServicio}}</ion-card-title>
-      </ion-card-header>
-
-      <ion-card-content>
+  <div *ngFor="let service of serviceData">
+    <div class="service-card">
+      <div class="time-estimate">
+        Tiempo estimado: {{service.serviceData.tiempoEstimado}}h
+      </div>
+      <h3 class="service-name">{{service.serviceData.nombreServicio}}</h3>
+      <p class="service-description descripcion-corta">
         {{service.serviceData.descripcionServicio}}
-      </ion-card-content>
+      </p>
 
-      <ion-grid>
-        <ion-row>
-          <ion-col>
-            <ion-chip [outline]="true" size="small">
-              Costo: ${{service.serviceData.precio}}
-            </ion-chip>
-          </ion-col>
-          <ion-col size="auto">
-            <ion-button
-              size="small"
-              id="option-popover-button"
-              (click)="openServiceOptions($event, service)"
-            >
-              <!-- Añade este click -->
-              <ion-icon
-                name="ellipsis-vertical-outline"
-                slot="icon-only"
-              ></ion-icon>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card>
+      <div class="bottom-section">
+        <div class="cost-badge">Costo: ${{service.serviceData.precio}}</div>
+        <button
+          class="menu-button"
+          aria-label="Más opciones"
+          id="option-popover-button"
+          (click)="openServiceOptions($event, service)"
+        ></button>
+      </div>
+    </div>
   </div>
 
   <!-- 📝 Mensaje cuando no hay servicios -->
-  <div
-    *ngIf="storeData.services.length === 0 && !isLoading"
-    class="ion-text-center ion-padding"
-  >
+  <div *ngIf="!serviceData && !isLoading" class="ion-text-center ion-padding">
     <ion-icon name="construct-outline" size="large" color="medium"></ion-icon>
     <p>No tienes servicios creados</p>
     <p>¡Crea tu primer servicio!</p>
@@ -79,7 +64,6 @@
       </ion-header>
       <ion-content class="ion-padding">
         <div *ngIf="currentSlideIndex === 0">
-          <h3></h3>
           <ion-input
             [(ngModel)]="newService.nombreServicio"
             placeholder="Nombre de Servicio"

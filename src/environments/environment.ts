@@ -7,7 +7,7 @@ export const environment = {
   firebase: {
     projectId: 'docut-50409',
     appId: '1:700839134495:web:19c0203a6b49491ad89c2a',
-    storageBucket: 'docut-50409.firebasestorage.app',
+    storageBucket: 'docut-50409.appspot.com',
     apiKey: 'AIzaSyDBrdyCJjBUJawut98qx-daMgDJ45sEWT8',
     authDomain: 'docut-50409.firebaseapp.com',
     messagingSenderId: '700839134495',

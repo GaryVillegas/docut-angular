@@ -2,12 +2,10 @@ import { Component, type OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { StoreService } from '../store.service';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
-import { switchMap, finalize, catchError } from 'rxjs/operators';
-import type { UserStoreData } from '../types/store';
-import type { UserData } from '../types/user';
 import { ToastController } from '@ionic/angular';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { userData } from '../types/user.type';
+import { storeData } from '../types/store.type';
 
 @Component({
   selector: 'app-profile',
@@ -16,9 +14,9 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
   standalone: false,
 })
 export class ProfilePage implements OnInit {
-  userData: UserData = {
+  userData: userData = {
     UID: '',
-    userInfoData: {
+    userInfo: {
       name: '',
       lastName: '',
       rut: '',
@@ -26,12 +24,16 @@ export class ProfilePage implements OnInit {
     },
   };
 
-  userStoreData: UserStoreData = {
-    userUID: '',
+  userStoreData: storeData = {
+    storeId: '',
     storeInfo: {
       bussinessName: '',
       direction: '',
       categories: [],
+      userUID: '',
+    },
+    storeStatus: {
+      statusCondition: false,
     },
   };
 
@@ -74,58 +76,24 @@ export class ProfilePage implements OnInit {
         this.isLoading = false;
         return;
       }
-
       console.log('✅ Usuario encontrado:', user.uid);
-
-      // 📊 Cargar datos del usuario
-      this.storeServ
-        .getUserData(user.uid)
-        .pipe(
-          switchMap((userData) => {
-            this.userData = userData;
-            this.isClient = userData.userInfoData.tipe === 'cliente';
-
-            console.log('✅ Datos de usuario cargados:', userData);
-
-            // 🏪 Si es cliente, cargar datos de tienda
-            if (this.isClient) {
-              return this.storeServ.getStoreData(user.uid).pipe(
-                catchError((error) => {
-                  console.warn('⚠️ Error cargando tienda:', error);
-                  return of(this.userStoreData);
-                })
-              );
-            } else {
-              this.setDinamicClass = 'ion-hide';
-              return of(null);
-            }
-          }),
-          finalize(() => {
-            this.isLoading = false;
-          }),
-          catchError((error) => {
-            console.error('❌ Error cargando perfil:', error);
-            this.loadingError = 'Error al cargar los datos del perfil';
-            return of(null);
-          })
-        )
-        .subscribe({
-          next: (storeData) => {
-            if (storeData && this.isClient) {
-              this.userStoreData = storeData;
-              console.log('✅ Datos de tienda cargados:', storeData);
-              this.setDinamicClass = storeData.storeInfo.bussinessName
-                ? 'ion-hide'
-                : '';
-            }
-          },
-          error: (error) => {
-            console.error('❌ Error final:', error);
-          },
-        });
+      const userData = await this.storeServ.getUserData(user.uid);
+      if (userData) {
+        this.userData = userData;
+        this.isLoading = false;
+        const storeData = await this.storeServ.getUserStore(user.uid);
+        if (storeData) {
+          this.userStoreData = storeData;
+          console.log('Tienda encontrada');
+          this.isLoading = false;
+        }
+      }
+      console.log('Usuario encontrado');
     } catch (error) {
       console.error('❌ Error esperando auth state:', error);
       this.showAlert('Error de autenticación.');
+      this.isLoading = false;
+    } finally {
       this.isLoading = false;
     }
   }
@@ -153,7 +121,7 @@ export class ProfilePage implements OnInit {
     try {
       await this.storeServ.updateUser(
         this.userData.UID,
-        this.userData.userInfoData
+        this.userData.userInfo
       );
       this.showToast('Exito', '✅ Usuario editado con exito.');
       this.isLoading = false;

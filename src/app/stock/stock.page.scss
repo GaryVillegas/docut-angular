@@ -1,0 +1,118 @@
+ion-button {
+  --background: #673ab7;
+  --color: white;
+  --background-activated: #5e4092;
+}
+
+ion-buttons {
+  ion-button {
+    --background: #f6f8fc;
+    --color: #000;
+  }
+}
+
+ion-input,
+ion-textarea {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.descripcion-corta {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ion-grid {
+  ion-row {
+    ion-col {
+      ion-back-button {
+        --background: #673ab7;
+        --color: white;
+        --border-radius: 40px;
+        width: 40px;
+        height: 40px;
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
+.product-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+}
+
+.time-estimate {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.product-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.product-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.bottom-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cost-badge {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.menu-button {
+  background-color: #6f42c1;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: #5a2d91;
+}
+
+.menu-button::before {
+  content: "⋮";
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}

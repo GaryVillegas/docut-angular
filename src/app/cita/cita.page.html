@@ -1,0 +1,56 @@
+<ion-content [fullscreen]="true">
+  <ion-grid [fixed]="true">
+    <ion-row>
+      <ion-col size="auto">
+        <ion-back-button default-href="/tabs/home" text="">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-back-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div *ngIf="currentSlide === 0" class="slide ion-padding">
+    <!--here we select the current date to de actual "date"-->
+    <ion-datetime
+      color="rose"
+      presentation="date"
+      [min]="minDate"
+      datetime="YYYY-MM-DD"
+      (ionChange)="onDateChange($event)"
+    ></ion-datetime>
+  </div>
+
+  <div *ngIf="currentSlide === 1" class="slide ion-padding">
+    <!-- Tenemos que ver la forma de seleccionarla-->
+    <ion-datetime
+      class="ion-margin-top"
+      presentation="time"
+      (ionChange)="onTimeChange($event)"
+    ></ion-datetime>
+    <ion-button (click)="selectTimeNextSlide()"> Siguiente </ion-button>
+  </div>
+
+  <div *ngIf="currentSlide === 2" class="slide ion-padding">
+    <h3>¿Para quien es la cita?</h3>
+    <ion-input
+      [(ngModel)]="cita.nombreUsuario"
+      placeholder="Nombre"
+    ></ion-input>
+    <ion-input
+      [(ngModel)]="cita.apellidoUsuario"
+      placeholder="Apellido"
+    ></ion-input>
+    <ion-button (click)="setOpenAlert(true)"> Crear Cita </ion-button>
+    <ion-alert
+      [isOpen]="isAlertOpen"
+      header="Seleccion Metodo de Pago"
+      message="Por favor seleccione el metodo de pago que mas le acomode."
+      [buttons]="alertButtons"
+    ></ion-alert>
+  </div>
+
+  <div *ngIf="currentSlide === 3">
+    <h4>Cita Agendada 😎</h4>
+    <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
+  </div>
+</ion-content>

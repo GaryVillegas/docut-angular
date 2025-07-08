@@ -1,0 +1,70 @@
+ion-grid {
+  ion-row {
+    ion-col {
+      ion-back-button {
+        --background: #673ab7;
+        --color: white;
+        --border-radius: 40px;
+        width: 40px;
+        height: 40px;
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
+ion-datetime {
+  --background: #673ab7;
+  border-radius: 16px;
+}
+
+ion-button {
+  --background: #673ab7;
+  color: white;
+  --background-activated: #5e4092;
+}
+
+ion-datetime::part(calendar-day) {
+  background: whitesmoke;
+  color: black;
+}
+ion-datetime::part(calendar-day today) {
+  color: #673ab7;
+  font-weight: bold;
+}
+ion-datetime::part(calendar-day active) {
+  background-color: #673ab7;
+  color: white;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  contain: content;
+
+  /* Animación suave entre slides */
+  transition: transform 0.3s ease;
+}
+
+.slide:last-child {
+  ion-datetime {
+    --background: white;
+    border-radius: 16px;
+  }
+}
+
+ion-input {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.success-icon {
+  font-size: 120px;
+  color: var(--ion-color-tertiary);
+  margin-bottom: 32px;
+  contain: content;
+}

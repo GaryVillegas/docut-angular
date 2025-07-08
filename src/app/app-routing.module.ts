@@ -46,13 +46,35 @@ const routes: Routes = [
     path: 'register',
     loadChildren: () =>
       import('./register/register.module').then((m) => m.RegisterPageModule),
-  },  {
+  },
+  {
     path: 'create-store',
-    loadChildren: () => import('./create-store/create-store.module').then( m => m.CreateStorePageModule)
+    loadChildren: () =>
+      import('./create-store/create-store.module').then(
+        (m) => m.CreateStorePageModule
+      ),
+    canActivate: [AuthGuard],
   },
   {
     path: 'store-service',
-    loadChildren: () => import('./store-service/store-service.module').then( m => m.StoreServicePageModule)
+    loadChildren: () =>
+      import('./store-service/store-service.module').then(
+        (m) => m.StoreServicePageModule
+      ),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'cita',
+    loadChildren: () =>
+      import('./cita/cita.module').then((m) => m.CitaPageModule),
+    canActivate: [AuthGuard],
+  },  {
+    path: 'category',
+    loadChildren: () => import('./category/category.module').then( m => m.CategoryPageModule)
+  },
+  {
+    path: 'stock',
+    loadChildren: () => import('./stock/stock.module').then( m => m.StockPageModule)
   },
 
 ];

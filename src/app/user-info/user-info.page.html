@@ -1,38 +1,6 @@
 <ion-content [fullscreen]="true" class="ion-padding">
-  <!-- Slide 1: Tipo de usuario -->
+  <!-- Slide 1: Información personal -->
   <div *ngIf="currentSlideIndex === 0" class="slide">
-    <h2 class="title">¿Qué planeas hacer?</h2>
-
-    <div class="options-grid">
-      <div
-        class="option-card"
-        [class.selected]="userInfo.tipe === 'cliente'"
-        (click)="selectUserType('cliente')"
-      >
-        <ion-icon name="person" class="option-icon"></ion-icon>
-        <span>Cliente</span>
-      </div>
-
-      <div
-        class="option-card"
-        [class.selected]="userInfo.tipe === 'administrador'"
-        (click)="selectUserType('administrador')"
-      >
-        <ion-icon name="people" class="option-icon"></ion-icon>
-        <span>Administrador</span>
-      </div>
-    </div>
-
-    <div class="buttons-row">
-      <ion-button expand="block" (click)="nextSlide()">Siguiente</ion-button>
-      <ion-button expand="block" fill="clear" color="medium" (click)="cancel()"
-        >Cancelar</ion-button
-      >
-    </div>
-  </div>
-
-  <!-- Slide 2: Información personal -->
-  <div *ngIf="currentSlideIndex === 1" class="slide">
     <h2 class="title">Infórmanos sobre ti</h2>
 
     <ion-input
@@ -47,7 +15,8 @@
     ></ion-input>
     <ion-input
       [(ngModel)]="userInfo.rut"
-      placeholder="RUT"
+      (ionInput)="formatRUT($event)"
+      placeholder="RUT (ej: 12.345.678-9)"
       class="custom-input"
     ></ion-input>
 
@@ -63,67 +32,7 @@
     </div>
   </div>
 
-  <!-- Slide 3: Información del negocio -->
-  <div
-    *ngIf="currentSlideIndex === 2 && userInfo.tipe === 'administrador'"
-    class="slide"
-  >
-    <h2 class="title">Infórmanos sobre tu negocio</h2>
-
-    <ion-input
-      [(ngModel)]="storeInfo.bussinessName"
-      placeholder="Nombre de negocio"
-      class="custom-input"
-    ></ion-input>
-    <ion-input
-      [(ngModel)]="storeInfo.direction"
-      placeholder="Dirección"
-      class="custom-input"
-    ></ion-input>
-
-    <div class="buttons-row">
-      <ion-button expand="block" (click)="nextSlide()">Siguiente</ion-button>
-      <ion-button
-        expand="block"
-        fill="clear"
-        color="medium"
-        (click)="prevSlide()"
-        >Volver</ion-button
-      >
-    </div>
-  </div>
-
-  <!-- Slide 4: Categorías -->
-  <div
-    *ngIf="currentSlideIndex === 3 && userInfo.tipe === 'administrador'"
-    class="slide"
-  >
-    <h2 class="title">Elige tus categorías</h2>
-
-    <div class="categories-grid">
-      <ion-chip
-        *ngFor="let category of categories"
-        [color]="isCategorySelected(category) ? 'tertiary' : 'medium'"
-        (click)="toggleCategory(category)"
-      >
-        {{category}}
-      </ion-chip>
-    </div>
-
-    <div class="buttons-row">
-      <ion-button expand="block" (click)="nextSlide()">Siguiente</ion-button>
-      <ion-button
-        expand="block"
-        fill="clear"
-        color="medium"
-        (click)="prevSlide()"
-        >Volver</ion-button
-      >
-    </div>
-  </div>
-
-  <!-- Slide 5: Final -->
-  <div *ngIf="currentSlideIndex === 4" class="slide final-slide">
+  <div *ngIf="currentSlideIndex === 1" class="slide final-slide">
     <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
     <ion-button color="tertiary" expand="block" (click)="handleSubmit()"
       >Finalizar</ion-button
