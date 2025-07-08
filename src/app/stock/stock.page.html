@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" color="light">
   <ion-grid [fixed]="true">
     <ion-row>
       <ion-col size="auto">
@@ -12,4 +12,92 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  <ion-grid>
+    <ion-col>
+      <ion-button size="small" (click)="setOpenModal(true)">
+        Crear Producto
+      </ion-button>
+    </ion-col>
+  </ion-grid>
+  @if (isLoading){
+  <div class="ion-text-center ion-padding">
+    <ion-spinner color="tertiary"></ion-spinner>
+    <p>Cargando servicios...</p>
+  </div>
+  }@else{}
+  <!--Create Product modal-->
+  <ion-modal [isOpen]="isCreateModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title> Crear Producto </ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div>
+          <ion-input
+            placeholder="Nombre Producto"
+            [(ngModel)]="stockInfo.nombre"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              id="btn1"
+              slot="end"
+              (click)="presentPopover($event, 'btn1')"
+            ></ion-icon>
+          </ion-input>
+          <ion-textarea
+            placeholder="Descripcion Producto"
+            [(ngModel)]="stockInfo.descripcion"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              id="btn2"
+              slot="end"
+              (click)="presentPopover($event, 'btn2')"
+            ></ion-icon>
+          </ion-textarea>
+          <ion-input
+            placeholder="Cantidad Producto"
+            type="number"
+            [(ngModel)]="stockInfo.cantidad"
+          >
+            <ion-icon
+              name="help-circle-outline"
+              id="btn3"
+              slot="end"
+              (click)="presentPopover($event, 'btn3')"
+            ></ion-icon>
+          </ion-input>
+          <div class="buttons-row">
+            <ion-button expand="block" (click)="createProduct()">
+              Crear Producto
+            </ion-button>
+            <ion-button
+              expand="block"
+              fill="clear"
+              color="medium"
+              (click)="cancel()"
+            >
+              Cancelar
+            </ion-button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <!------------------------>
+  <!-- Popover Info -->
+  <ion-popover
+    #popover
+    [isOpen]="isOpenPopOver"
+    (didDismiss)="isOpenPopOver = false"
+  >
+    <ng-template>
+      <ion-content class="ion-padding">
+        <p>{{currentPopoverContent}}</p>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+  <!------------------>
 </ion-content>
