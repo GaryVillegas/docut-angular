@@ -45,6 +45,8 @@ export class HomePage implements OnInit {
     await this.loadStores();
     await this.loadDate(user.uid);
     await this.automaticCancel();
+    await this.loadStoreDates();
+    await this.loadUserStoreAndDates(user.uid);
   }
 
   async ionViewWillEnter() {
@@ -242,6 +244,54 @@ export class HomePage implements OnInit {
         console.error('Error al tratar de editar la cita: ', error);
         this.presentToast('Error', 'Error al actualizar la cita.', 'danger');
       }
+    }
+  }
+
+  private async loadUserStoreAndDates(userUID: string) {
+    try {
+      // Obtener la tienda del usuario
+      const userStore = await this.storeServ.getUserStore(userUID);
+
+      if (userStore && userStore.storeId) {
+        console.log(
+          '✅ Usuario tiene tienda:',
+          userStore.storeInfo.bussinessName
+        );
+
+        // Asignar como tienda seleccionada
+        this.storeSelected = userStore.storeId;
+
+        // Cargar las citas de su tienda
+        await this.loadStoreDates();
+      } else {
+        console.log('❌ Usuario no tiene tienda');
+        this.storeDates = [];
+      }
+    } catch (error) {
+      console.error('Error cargando tienda del usuario:', error);
+      this.storeDates = [];
+    }
+  }
+
+  storeDates: dateData[] = [];
+
+  async loadStoreDates() {
+    const selectedStore = this.getSelectedStore();
+    console.log(selectedStore);
+    if (selectedStore?.storeId) {
+      try {
+        const result = await this.storeServ.getStoreDate(selectedStore.storeId);
+        this.storeDates = result || []; // Corregir la lógica aquí
+      } catch (error) {
+        this.storeDates = [];
+        this.presentToast(
+          'Error',
+          'error al obtener las citas de la tienda.',
+          'danger'
+        );
+      }
+    } else {
+      this.storeDates = [];
     }
   }
 

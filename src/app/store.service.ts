@@ -436,6 +436,32 @@ export class StoreService {
     }
   }
 
+  async getStoreDate(storeId: string): Promise<dateData[]> {
+    try {
+      if (!storeId) return [];
+
+      const dateQuery = query(
+        collection(this.FIREBASE_DB, 'cita'),
+        where('cita.idNegocio', '==', storeId),
+        where('cita.status', 'in', ['activa', 'En Proceso'])
+      );
+      const dateSnapshot = await getDocs(dateQuery);
+      const dates = dateSnapshot.docs.map((date) => {
+        const dateData = date.data();
+        return {
+          dateId: date.id,
+          dateData: dateData['cita'],
+        } as dateData;
+      });
+
+      console.log('citas de tienda: ', dates);
+      return dates;
+    } catch (error) {
+      console.log('Error obteniendo citas de tienda: ', error);
+      return [];
+    }
+  }
+
   //Updatings
 
   /**
